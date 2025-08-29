@@ -9,15 +9,15 @@
 
 Basic Function Documentation:\
 **init_display()**\
-Starts the whole thing up\
+Starts the whole thing up
 
 **create_ui(int)**\
 Starts the UI, but allows for debugging\
   0 = Nothing\
   1 = Screen Text Test\
-  2 = Color Test\
+  2 = Color Test
 
 **chinScreen_backlight(int)**\
 Backlight control I think\
   0 = On\
-  1 = Off\
+  1 = Off
