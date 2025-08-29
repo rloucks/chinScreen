@@ -44,3 +44,21 @@ inline void create_ui(int debugChin) {
 
     Serial.println("UI created");
 }
+
+void chinScreen_backlight_on() {
+    bsp_display_backlight_on();
+}
+
+void chinScreen_backlight_off() {
+    bsp_display_backlight_off();
+}
+
+inline void chinScreen_text(char *m) {
+   bsp_display_lock(0);  // lock because LVGL APIs are not thread-safe
+
+    lv_obj_t *label = lv_label_create(lv_scr_act());
+    lv_label_set_text(label, m);
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+    bsp_display_unlock();	
+}
