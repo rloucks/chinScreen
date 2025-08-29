@@ -9,13 +9,13 @@ void setup() {
     Serial.println(title + " start");
 
     init_display();   // from chinScreen
-    create_ui(0);      // from chinScreen || 0 = no init text, 1 = init text
+    create_ui(2);      // from chinScreen || 0 = no init text, 1 = init text, 2 = color test
 
     Serial.println(title + " end");
 }
 
 void loop() {
     Serial.println("IDLE loop");
-    chinScreen_text("Hello World");
+    //chinScreen_text("Hello World");
     delay(1000);
 }

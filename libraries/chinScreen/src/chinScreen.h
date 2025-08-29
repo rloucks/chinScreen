@@ -1,3 +1,13 @@
+//         __     __         _______                              
+//  .----.|  |--.|__|.-----.|     __|.----.----.-----.-----.-----.
+//  |  __||     ||  ||     ||__     ||  __|   _|  -__|  -__|     |
+//  |____||__|__||__||__|__||_______||____|__| |_____|_____|__|__|
+//
+//   Stupid library for the JC3248W525EN using lvgl because it works
+//
+//
+
+
 #pragma once
 #include <Arduino.h>
 #include <lvgl.h>
@@ -30,31 +40,65 @@ inline void init_display() {
     Serial.println("Display init done");
 }
 
-// Create the UI elements (labels, buttons, etc.)
 inline void create_ui(int debugChin) {
     Serial.println("Create UI");
 
-    bsp_display_lock(0);  // lock because LVGL APIs are not thread-safe
+    bsp_display_lock(0);  
 	if (debugChin == 1) {
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "chinScreen Works!");
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+		lv_obj_t *label = lv_label_create(lv_scr_act());
+		lv_label_set_text(label, "chinScreen Works!");
+		lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+		}
+	
+	if (debugChin == 2) {
+	   // Create a full-screen container
+    lv_obj_t *scr = lv_scr_act();
+    lv_obj_clean(scr); // clear screen before test
+
+    // Array of test colors
+    lv_color_t colors[] = {
+        lv_palette_main(LV_PALETTE_RED),
+        lv_palette_main(LV_PALETTE_GREEN),
+        lv_palette_main(LV_PALETTE_BLUE),
+        lv_palette_main(LV_PALETTE_YELLOW),
+        lv_palette_main(LV_PALETTE_ORANGE),
+        lv_palette_main(LV_PALETTE_PURPLE),
+        lv_palette_main(LV_PALETTE_CYAN),
+        lv_palette_main(LV_PALETTE_GREY),
+    };
+
+    const char* names[] = {
+        "Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Cyan", "Grey"
+    };
+
+    // Create colored rectangles with labels
+    for (int i = 0; i < 8; i++) {
+        lv_obj_t *rect = lv_obj_create(scr);
+        lv_obj_set_size(rect, 80, 60);
+        lv_obj_set_style_bg_color(rect, colors[i], LV_PART_MAIN);
+        lv_obj_align(rect, LV_ALIGN_TOP_LEFT, (i % 4) * 85, (i / 4) * 65);
+
+        lv_obj_t *label = lv_label_create(rect);
+        lv_label_set_text(label, names[i]);
+        lv_obj_center(label);
+    }
+
 	}
     bsp_display_unlock();
 
     Serial.println("UI created");
 }
 
-void chinScreen_backlight_on() {
-    bsp_display_backlight_on();
-}
-
-void chinScreen_backlight_off() {
-    bsp_display_backlight_off();
+void chinScreen_backlight(int bLight) {   // this needs some testing
+	if (bLight == 0) {
+    bsp_display_backlight_off(); 
+	} else {
+	bsp_display_backlight_on();
+	}
 }
 
 inline void chinScreen_text(char *m) {
-   bsp_display_lock(0);  // lock because LVGL APIs are not thread-safe
+   bsp_display_lock(0);  
 
     lv_obj_t *label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, m);
