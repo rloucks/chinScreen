@@ -3,21 +3,21 @@
 **Stupid library for the JC3248W525EN using lvgl because it works**
 
 > [!NOTE]
-> Remember to use the following header to set the orientation:
-> #define LVGL_PORT_ROTATION_DEGREE 0    // set the inital rotation. Default landscape is 90
+> Remember to use the following header to set the orientation:\
+> #define LVGL_PORT_ROTATION_DEGREE 0\
 > #include <chinScreen.h>
 
-Basic Function Documentation:
-**init_display()**
-Starts the whole thing up
+Basic Function Documentation:\
+**init_display()**\
+Starts the whole thing up\
 
-**create_ui(int)**
-Starts the UI, but allows for debugging
-  0 = Nothing
-  1 = Screen Text Test
-  2 = Color Test
+**create_ui(int)**\
+Starts the UI, but allows for debugging\
+  0 = Nothing\
+  1 = Screen Text Test\
+  2 = Color Test\
 
-**chinScreen_backlight(int)**
-Backlight control I think
-  0 = On
-  1 = Off
+**chinScreen_backlight(int)**\
+Backlight control I think\
+  0 = On\
+  1 = Off\
