@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map For JC3248W535EN-Touch-LCD
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+JC3248W535EN	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+setColor	KEYWORD2
+clear	KEYWORD2
+drawFillRect	KEYWORD2
+drawRect	KEYWORD2
+drawFillCircle	KEYWORD2
+drawCircleOutline	KEYWORD2
+drawLine	KEYWORD2
+drawTriangle	KEYWORD2
+drawFillTriangle	KEYWORD2
+drawRoundRect	KEYWORD2
+drawFillRoundRect	KEYWORD2
+drawEllipse	KEYWORD2
+drawFillEllipse	KEYWORD2
+prt	KEYWORD2
+flush	KEYWORD2
+getTouchPoint	KEYWORD2
+drawQRCode	KEYWORD2
+setFont	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
