@@ -41,6 +41,17 @@ inline void init_display() {
     Serial.println("Display init done");
 }
 
+inline void chinScreen_clear()
+{
+    lv_obj_t *scr = lv_scr_act();
+    
+    // Remove all child objects
+    lv_obj_clean(scr);
+    
+    // Optional: force redraw
+    lv_obj_invalidate(scr);
+}
+
 inline void create_ui(int debugChin) {
     Serial.println("Create UI");
 
@@ -190,4 +201,76 @@ void chinScreen_rectangle(const char* bgColorName,
     else align = LV_ALIGN_CENTER; // fallback
 
     lv_obj_align(rect, align, 0, 0);
+}
+
+void chinScreen_circle(const char* fillColorName, const char* borderColorName, uint16_t radius,
+                const char* verticalPos = "middle", const char* horizontalPos = "center")
+{
+    lv_color_t fillColor   = getColorByName(fillColorName);
+    lv_color_t borderColor = getColorByName(borderColorName);
+
+    lv_obj_t *circle = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(circle, radius * 2, radius * 2);
+
+    // Style
+    lv_obj_set_style_bg_color(circle, fillColor, 0);
+    lv_obj_set_style_border_color(circle, borderColor, 0);
+    lv_obj_set_style_border_width(circle, 3, 0);
+    lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, 0);
+
+    // Position
+    lv_align_t align = LV_ALIGN_CENTER;
+    if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_TOP_LEFT;
+    else if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_TOP_MID;
+    else if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_TOP_RIGHT;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_LEFT_MID;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_CENTER;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_RIGHT_MID;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_BOTTOM_LEFT;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_BOTTOM_MID;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_BOTTOM_RIGHT;
+
+    lv_obj_align(circle, LV_ALIGN_CENTER, 0, 0); // default center
+    lv_obj_align(circle, align, 0, 0);
+}
+
+// -----------------------
+// Triangle
+// -----------------------
+void chinScreen_triangle(const char* fillColorName, const char* borderColorName,
+                  uint16_t width, uint16_t height,
+                  const char* verticalPos = "middle", const char* horizontalPos = "center")
+{
+    lv_color_t fillColor   = getColorByName(fillColorName);
+    lv_color_t borderColor = getColorByName(borderColorName);
+
+    static lv_point_t points[3];
+
+    points[0].x = 0;      points[0].y = height;
+    points[1].x = width/2; points[1].y = 0;
+    points[2].x = width;  points[2].y = height;
+
+    lv_obj_t *triangle = lv_line_create(lv_scr_act());
+    lv_line_set_points(triangle, points, 3); // set points
+    lv_obj_set_style_line_color(triangle, borderColor, 0);
+    lv_obj_set_style_line_width(triangle, 3, 0);
+
+    // For filled triangle, create a polygon (lvgl 8 uses lv_canvas or lv_obj with mask)
+    lv_obj_set_style_bg_color(triangle, fillColor, 0);
+    lv_obj_set_style_bg_opa(triangle, LV_OPA_COVER, 0);
+
+    // Positioning
+    lv_align_t align = LV_ALIGN_CENTER;
+    if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_TOP_LEFT;
+    else if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_TOP_MID;
+    else if (strcmp(verticalPos, "top") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_TOP_RIGHT;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_LEFT_MID;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_CENTER;
+    else if (strcmp(verticalPos, "middle") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_RIGHT_MID;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "left") == 0) align = LV_ALIGN_BOTTOM_LEFT;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "center") == 0) align = LV_ALIGN_BOTTOM_MID;
+    else if (strcmp(verticalPos, "bottom") == 0 && strcmp(horizontalPos, "right") == 0) align = LV_ALIGN_BOTTOM_RIGHT;
+
+    lv_obj_align(triangle, LV_ALIGN_CENTER, 0, 0); // default center
+    lv_obj_align(triangle, align, 0, 0);
 }
