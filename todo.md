@@ -9,3 +9,6 @@
 - easy pin access?
 - popups?
 - touch regions
+
+
+- **Make it Faster to Compile!!!!**
