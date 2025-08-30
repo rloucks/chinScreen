@@ -25,3 +25,20 @@ Backlight control I think\
 **chinScreen_brightness(int)**\
 Set how bright the screen is\
   0-255 control
+
+** chinScreen_rectangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
+Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");\
+Colors:\
+- Black
+- White
+- Red
+- Green
+- Blue
+- Yellow
+- Cyan
+- Magenta
+- Gray
+- Orange
+- Purple
+- Pink
+
