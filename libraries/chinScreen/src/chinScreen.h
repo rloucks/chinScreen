@@ -89,13 +89,20 @@ inline void create_ui(int debugChin) {
     Serial.println("UI created");
 }
 
-void chinScreen_backlight(int bLight) {   // this needs some testing
+// Turn the backlight on and off
+inline void chinScreen_backlight(int bLight) {   
 	if (bLight == 0) {
     bsp_display_backlight_off(); 
 	} else {
 	bsp_display_backlight_on();
 	}
 }
+
+// Turn the backlight on and off
+inline void chinScreen_brightness(int howBright) {   
+	bsp_display_brightness_set(howBright);
+}
+
 
 inline void chinScreen_text(char *m) {
    bsp_display_lock(0);  
