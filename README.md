@@ -9,7 +9,7 @@
 >
 > See readme.md in library folder for all functions
 
-###Basic Function Documentation:
+### Basic Function Documentation:
 
 **init_display()**\
 Starts the whole thing up
