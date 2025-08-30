@@ -9,3 +9,6 @@
 - easy pin access?
 - popups?
 - touch regions
+
+- **SD Card fix**
+- **Make it Faster to Compile!!!!**
