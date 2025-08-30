@@ -10,6 +10,12 @@
 > See readme.md in library folder for all functions\
 > https://github.com/rloucks/chinScreen/blob/main/libraries/chinScreen/readme.md
 
+
+> [!IMPORTANT]
+> <img width="536" height="386" alt="image" src="https://github.com/user-attachments/assets/e92ab03c-7026-410d-8a15-3082b83bc8dd" />
+
+
+
 ### Basic Function Documentation:
 
 **init_display()**\
