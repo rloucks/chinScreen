@@ -6,8 +6,11 @@
 > Remember to use the following header to set the orientation:\
 > #define LVGL_PORT_ROTATION_DEGREE 0\
 > #include <chinScreen.h>
+>
+> See readme.md in library folder for all functions
 
 Basic Function Documentation:\
+
 **init_display()**\
 Starts the whole thing up
 
@@ -30,8 +33,8 @@ Set how bright the screen is\
 **chinScreen_triangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
 **chinScreen_circle(Background Color, Border Color, radius, H Position, V Position);**\
 
-Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");\
-Colors:\
+Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");
+Colors:
 - Black
 - White
 - Red
