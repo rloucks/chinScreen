@@ -42,3 +42,6 @@ Colors:\
 - Purple
 - Pink
 
+**chinScreen_clear()**\
+duh
+
