@@ -7,7 +7,7 @@
 > #define LVGL_PORT_ROTATION_DEGREE 0\
 > #include <chinScreen.h>
 >
-> See readme.md in library folder for all functions
+> See readme.md in library folder for all functions\
 > https://github.com/rloucks/chinScreen/blob/main/libraries/chinScreen/readme.md
 
 ### Basic Function Documentation:
