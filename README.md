@@ -26,7 +26,10 @@ Backlight control I think\
 Set how bright the screen is\
   0-255 control
 
-** chinScreen_rectangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
+**chinScreen_rectangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
+**chinScreen_triangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
+**chinScreen_circle(Background Color, Border Color, radius, H Position, V Position);**\
+
 Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");\
 Colors:\
 - Black
