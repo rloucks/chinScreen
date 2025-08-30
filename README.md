@@ -21,3 +21,7 @@ Starts the UI, but allows for debugging\
 Backlight control I think\
   0 = On\
   1 = Off
+  
+**chinScreen_brightness(int)**\
+Set how bright the screen is\
+  0-255 control
