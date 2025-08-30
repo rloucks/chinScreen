@@ -14,6 +14,7 @@
 #include "display.h"
 #include "esp_bsp.h"
 #include "lv_port.h"
+#include <ctype.h>  // for tolower
 
 
 
@@ -112,4 +113,81 @@ inline void chinScreen_text(char *m) {
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
     bsp_display_unlock();	
+}
+
+// Simple parallel arrays for color names and values using lv_color_make
+static const char* colorNames[] = {
+    "black", "white", "red", "green", "blue",
+    "yellow", "cyan", "magenta", "gray", "orange",
+    "purple", "pink"
+};
+
+static const lv_color_t colorValues[] = {
+    lv_color_make(0,0,0),       // black
+    lv_color_make(255,255,255), // white
+    lv_color_make(255,0,0),     // red
+    lv_color_make(0,255,0),     // green
+    lv_color_make(0,0,255),     // blue
+    lv_color_make(255,255,0),   // yellow
+    lv_color_make(0,255,255),   // cyan
+    lv_color_make(255,0,255),   // magenta
+    lv_color_make(128,128,128), // gray
+    lv_color_make(255,165,0),   // orange
+    lv_color_make(128,0,128),   // purple
+    lv_color_make(255,192,203)  // pink
+};
+
+lv_color_t getColorByName(const char* name) {
+    for (uint8_t i = 0; i < sizeof(colorNames)/sizeof(colorNames[0]); i++) {
+        // Case-insensitive compare
+        const char* p1 = name;
+        const char* p2 = colorNames[i];
+        bool match = true;
+        while (*p1 && *p2) {
+            if (tolower(*p1) != tolower(*p2)) {
+                match = false;
+                break;
+            }
+            p1++;
+            p2++;
+        }
+        if (match && *p1 == '\0' && *p2 == '\0') {
+            return colorValues[i];
+        }
+    }
+    return lv_color_make(0,0,0); // default black if not found
+}
+
+// Rectangle drawing function
+void chinScreen_rectangle(const char* bgColorName,
+                   const char* borderColorName,
+                   int width, int height,
+                   const char* vAlign,   // "top", "middle", "bottom"
+                   const char* hAlign)   // "left", "center", "right"
+{
+    lv_obj_t *rect = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(rect, width, height);
+
+    // Background color
+    lv_obj_set_style_bg_color(rect, getColorByName(bgColorName), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, LV_PART_MAIN);
+
+    // Border color
+    lv_obj_set_style_border_color(rect, getColorByName(borderColorName), LV_PART_MAIN);
+    lv_obj_set_style_border_width(rect, 3, LV_PART_MAIN);
+
+    // Positioning
+    lv_align_t align;
+    if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_TOP_LEFT;
+    else if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_TOP_MID;
+    else if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_TOP_RIGHT;
+    else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_LEFT_MID;
+    else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_CENTER;
+    else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_RIGHT_MID;
+    else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_BOTTOM_LEFT;
+    else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_BOTTOM_MID;
+    else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_BOTTOM_RIGHT;
+    else align = LV_ALIGN_CENTER; // fallback
+
+    lv_obj_align(rect, align, 0, 0);
 }
