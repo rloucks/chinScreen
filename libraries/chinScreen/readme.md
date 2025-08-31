@@ -1,6 +1,6 @@
-<img width="530" height="116" alt="image" src="https://github.com/user-attachments/assets/464fcc3b-f911-49a7-acf1-0e1cd95a92b2" />
+<img width="289" height="116" alt="image" src="https://github.com/user-attachments/assets/502aafaf-2ab0-443a-b9e0-9ddc04817f13" />
 
-**Stupid library for the JC3248W525EN using lvgl because it works**
+**Robust library for the JC3248W525EN using lvgl because it works**
 
 > [!NOTE]
 > Remember to use the following header to set the orientation:\

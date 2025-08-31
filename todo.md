@@ -1,8 +1,5 @@
 **To-Do**
 
-- Fix Flickering (?)
-- Fix Triangle Background
-- Make example files
 - Add image function
 - Add movie function
 - Use sound
@@ -10,5 +7,5 @@
 - popups?
 - touch regions
 
-- **SD Card fix**
+- **Image files not working, SD Card is**
 - **Make it Faster to Compile!!!!**

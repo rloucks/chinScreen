@@ -1,6 +1,7 @@
-<img width="530" height="116" alt="image" src="https://github.com/user-attachments/assets/464fcc3b-f911-49a7-acf1-0e1cd95a92b2" />
+<img width="289" height="116" alt="image" src="https://github.com/user-attachments/assets/b94c7160-a1c1-4d21-ba04-0b2e1dd884c5" />
 
-**Stupid library for the JC3248W525EN using lvgl because it works**
+
+**Robust Ardunio ESP32 (S3) library for the JC3248W525EN using lvgl because it works**
 
 > [!NOTE]
 > Remember to use the following header to set the orientation:\
@@ -40,21 +41,5 @@ Set how bright the screen is\
 **chinScreen_triangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
 **chinScreen_circle(Background Color, Border Color, radius, H Position, V Position);**\
 
-Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");
-Colors:
-- Black
-- White
-- Red
-- Green
-- Blue
-- Yellow
-- Cyan
-- Magenta
-- Gray
-- Orange
-- Purple
-- Pink
-
-**chinScreen_clear()**\
-duh
+<img width="377" height="578" alt="image" src="https://github.com/user-attachments/assets/6b3b12e1-1b45-4889-90c9-f3209ad7fb33" />
 
