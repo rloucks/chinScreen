@@ -1,7 +1,7 @@
 <img width="289" height="116" alt="image" src="https://github.com/user-attachments/assets/b94c7160-a1c1-4d21-ba04-0b2e1dd884c5" />
 
 
-**Robust library for the JC3248W525EN using lvgl because it works**
+**Robust Ardunio ESP32 (S3) library for the JC3248W525EN using lvgl because it works**
 
 > [!NOTE]
 > Remember to use the following header to set the orientation:\
