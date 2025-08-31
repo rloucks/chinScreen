@@ -41,21 +41,5 @@ Set how bright the screen is\
 **chinScreen_triangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
 **chinScreen_circle(Background Color, Border Color, radius, H Position, V Position);**\
 
-Example:  chinScreen_rectangle("orange", "black", 120, 80, "middle", "right");
-Colors:
-- Black
-- White
-- Red
-- Green
-- Blue
-- Yellow
-- Cyan
-- Magenta
-- Gray
-- Orange
-- Purple
-- Pink
-
-**chinScreen_clear()**\
-duh
+<img width="377" height="578" alt="image" src="https://github.com/user-attachments/assets/6b3b12e1-1b45-4889-90c9-f3209ad7fb33" />
 
