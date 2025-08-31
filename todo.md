@@ -10,5 +10,5 @@
 - popups?
 - touch regions
 
-- **SD Card fix**
+- **Image files not working, SD Card is**
 - **Make it Faster to Compile!!!!**
