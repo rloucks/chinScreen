@@ -7,30 +7,6 @@
 > #define LVGL_PORT_ROTATION_DEGREE 0\
 > #include <chinScreen.h>
 
-## Table of Contents
-
-- [Installation](#installation)  
-- [Initialization](#initialization)  
-- [Display Controls](#display-controls)  
-- [Backgrounds](#backgrounds)  
-- [Text Functions](#text-functions)  
-- [Shapes](#shapes)  
-  - [Rectangle](#rectangle)  
-  - [Circle](#circle)  
-  - [Triangle](#triangle)  
-  - [Hexagon](#hexagon)  
-  - [Oval](#oval)  
-- [Shape Text](#shape-text)  
-- [Buttons](#buttons)  
-- [Sliders](#sliders)  
-- [Toggle Switches](#toggle-switches)  
-- [Animations](#animations)  
-- [Progress Bar](#progress-bar)  
-- [Utilities](#utilities)  
-- [Example UI](#example-ui)
-
----
-
 ## Initialization
 ```
 init_display()
@@ -47,6 +23,11 @@ chinScreen_backlight(0); // Off
 Set Brightness
 ```
 chinScreen_brightness(128); // Range 0-255
+```
+
+Initializes SD Card
+```
+chinScreen_init_sd_card();
 ```
 
 ---
