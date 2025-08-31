@@ -1,111 +1,80 @@
-// chinScreen Bouncing Ball Example
-// Super simple animated ball that bounces around the screen
-
+#include <Arduino.h>
 #include "chinScreen.h"
 
-lv_obj_t* ball;
-lv_obj_t* particles[3]; // Trail particles that follow the ball
-int ballX = 160, ballY = 240; // Start in center
-float speedX = 4.5, speedY = 3.2; // Use float for smoother random changes
-int screenWidth = 320, screenHeight = 480; // Vertical screen
-// int screenWidth = 480, screenHeight = 320; // Horizontal screen
-int ballSize = 30;
+lv_obj_t *player;
+lv_obj_t *scoreLabel;
+int score = 0;
+bool gameOver = false;
 
-// Particle trail positions with proper spacing
-float particleX[3], particleY[3];
-int frameCount = 0;
+// Create a random falling shape
+void spawnShape() {
+  if (gameOver) return;
+
+  int shapeType = random(0, 3); // 0=rect, 1=circle, 2=triangle
+  lv_obj_t *shape = nullptr;
+
+  if (shapeType == 0) {
+    shape = chinScreen_rectangle("red", "white", 30, 30, "top", "center");
+  } else if (shapeType == 1) {
+    shape = chinScreen_circle("blue", "white", 15, "top", "center");
+  } else {
+    shape = chinScreen_triangle("yellow", "white", 30, 30, "top", "center");
+  }
+
+  // Random X
+  lv_obj_set_x(shape, random(20, 200));
+
+  // Animate downwards
+  chinScreen_animate(shape, ANIM_MOVE_Y, 0, 240, 3000, false);
+
+  // Check collision after animation
+  lv_timer_t *timer = lv_timer_create([](lv_timer_t *t) {
+    lv_obj_t *s = (lv_obj_t*) t->user_data;
+    if (!s || gameOver) return;
+
+    int sx = lv_obj_get_x(s);
+    int sy = lv_obj_get_y(s);
+    int px = lv_obj_get_x(player);
+    int py = lv_obj_get_y(player);
+
+    if (abs(sx - px) < 30 && abs(sy - py) < 30) {
+      chinScreen_text("GAME OVER!", 80, 120, "red", "large");
+      gameOver = true;
+    } else if (sy >= 220) {
+      score++;
+      char buf[20];
+      sprintf(buf, "Score: %d", score);
+      lv_label_set_text(scoreLabel, buf);
+    }
+
+    lv_obj_del(s);
+    lv_timer_del(t);
+  }, 3000, shape);
+}
 
 void setup() {
-    Serial.begin(115200);
-    init_display();
-    
-    // Dark background with gradient
-    chinScreen_background_gradient("navy", "purple", "vertical");
-    
-    // Create the bouncing ball
-    ball = chinScreen_circle("orange", "yellow", ballSize, "top", "left");
-    chinScreen_set_position(ball, ballX, ballY);
-    
-    // Create particle trail - different sizes and colors
-    particles[0] = chinScreen_circle("red", "red", 12, "top", "left");      // Closest to ball
-    particles[1] = chinScreen_circle("yellow", "yellow", 8, "top", "left");  // Middle
-    particles[2] = chinScreen_circle("white", "white", 5, "top", "left");    // Farthest
-    
-    // Initialize particle positions with proper spacing behind ball
-    for(int i = 0; i < 3; i++) {
-        particleX[i] = ballX - (i + 1) * 20; // Space them 20 pixels apart
-        particleY[i] = ballY - (i + 1) * 15; // Offset vertically too
-        chinScreen_set_position(particles[i], (int)particleX[i], (int)particleY[i]);
-    }
-    
-    // Add some random to initial speed
-    speedX += random(-200, 200) / 100.0; // Add -2 to +2 random
-    speedY += random(-200, 200) / 100.0;
-    
-    Serial.println("Random bouncing ball with trail started!");
-    Serial.printf("Screen: %dx%d\n", screenWidth, screenHeight);
+  Serial.begin(115200);
+  init_display();
+  chinScreen_clear();
+  chinScreen_background_solid("black");
+
+  // Player rectangle at bottom
+  player = chinScreen_rectangle("green", "white", 40, 20, "bottom", "center");
+  lv_obj_set_y(player, 220);
+
+  // Score
+  scoreLabel = lv_label_create(lv_scr_act());
+  lv_label_set_text(scoreLabel, "Score: 0");
+  lv_obj_set_style_text_color(scoreLabel, getColorByName("white"), LV_PART_MAIN);
+  lv_obj_align(scoreLabel, LV_ALIGN_TOP_MID, 0, 5);
+
+  // Spawn new shapes every 2s
+  lv_timer_create([](lv_timer_t *t) {
+    spawnShape();
+  }, 2000, NULL);
 }
 
 void loop() {
-    frameCount++;
-    
-    // Store previous ball position for smooth trail
-    float prevBallX = ballX;
-    float prevBallY = ballY;
-    
-    // Update ball position
-    ballX += speedX;
-    ballY += speedY;
-    
-    // Bounce off walls with MUCH more randomness
-    if (ballX <= ballSize || ballX >= screenWidth - ballSize) {
-        speedX = -speedX;
-        // Big random changes to make it truly unpredictable
-        speedX += random(-300, 300) / 100.0; // Add -3 to +3 random
-        speedY += random(-200, 200) / 100.0; // Add -2 to +2 random
-        // Keep speeds reasonable but allow variety
-        speedX = constrain(speedX, -8, 8);
-        speedY = constrain(speedY, -8, 8);
-        Serial.println("Side bounce - randomized!");
-    }
-    
-    if (ballY <= ballSize || ballY >= screenHeight - ballSize) {
-        speedY = -speedY;
-        // Big random changes here too
-        speedX += random(-200, 200) / 100.0;
-        speedY += random(-300, 300) / 100.0;
-        speedX = constrain(speedX, -8, 8);
-        speedY = constrain(speedY, -8, 8);
-        Serial.println("Top/bottom bounce - randomized!");
-    }
-    
-    // Update particle trail every frame for smooth following
-    // Move particles toward previous positions in chain
-    for(int i = 2; i >= 0; i--) {
-        if (i == 0) {
-            // First particle follows ball with delay
-            particleX[0] += (prevBallX - particleX[0]) * 0.3; // 30% catch-up
-            particleY[0] += (prevBallY - particleY[0]) * 0.3;
-        } else {
-            // Other particles follow the previous particle
-            particleX[i] += (particleX[i-1] - particleX[i]) * 0.4; // 40% catch-up
-            particleY[i] += (particleY[i-1] - particleY[i]) * 0.4;
-        }
-        
-        // Update particle position on screen
-        chinScreen_set_position(particles[i], (int)particleX[i], (int)particleY[i]);
-    }
-    
-    // Move the ball
-    chinScreen_set_position(ball, ballX, ballY);
-    
-    // Add tiny random variations every so often to keep it interesting
-    if (frameCount % 120 == 0) { // Every 2 seconds at 60fps
-        speedX += random(-50, 50) / 100.0;
-        speedY += random(-50, 50) / 100.0;
-        Serial.println("Random speed variation added!");
-    }
-    
-    // Small delay for smooth animation
-    delay(16); // ~60 FPS
+  lv_timer_handler();
+  delay(5);
 }
