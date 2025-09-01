@@ -189,7 +189,7 @@
 ## chinScreen_interface.h
 > [!IMPORTANT]
 >  Only loads when chinScreen_init_interface() is called
->  
+
 **Enhanced buttons with themes and styles**
 
     chinScreen_button("Click Me", callback, "middle", "center", 120, 50, "raised");
@@ -375,6 +375,54 @@ Interactive Image Buttons (LVGL Native)
         // Gallery auto-advances if slideshow is enabled
     }
 
+## chinScreen_video.h
+> [!IMPORTANT]
+>  Only loads when chinScreen_init_interface() is called
 
+**Simple Video Launch**
 
+    // Launch video with automatic playback
+    lv_obj_t* video = chinScreen_video_play("/videos/demo.mp4", 320, 240);
+    
+    // Custom positioning
+    chinScreen_video_play("/videos/intro.avi", 400, 300, "top", "center");
 
+**Custom Closing of the Video Object**
+
+    chinScreen_video_close()
+
+**Basic Playback Controls**
+
+    chinScreen_video_pause();  // Pause current video chinScreen_video_resume();  // Resume playback chinScreen_video_stop();  // Stop video
+
+**Usage Example:**
+
+    #include <chinScreen.h>
+    
+    void video_demo_callback(lv_event_t* e) {
+        // Launch a demo video
+        chinScreen_video_play("/videos/tutorial.mp4", 400, 300, "middle", "center");
+    }
+    
+    void setup() {
+        chinScreen_init_display();
+        chinScreen_init_commands();    // For SD card support
+        chinScreen_init_interface();   // For buttons  
+        chinScreen_init_video();       // Load video module
+        
+        // Initialize SD card
+        chinScreen_init_sd_card();
+        
+        // Create play button
+        chinScreen_button("Play Video", video_demo_callback, "middle", "center", 120, 50);
+    }
+    
+    void loop() {
+        // Video plays automatically once launched
+        // User can close with built-in close button
+        
+        // Optional: Check video status
+        if (chinScreen_video_is_playing()) {
+            // Video is currently playing
+        }
+    }
