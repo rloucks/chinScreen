@@ -307,6 +307,74 @@
 > [!IMPORTANT]
 >  Only loads when chinScreen_init_images() is called
 
-## chinScreen_video.h
-> [!IMPORTANT]
->  Only loads when chinScreen_init_video() is called
+
+**Smart Image Format Detection**
+
+    // Automatic format detection and validation
+    chinScreen_img_format_t format = chinScreen_detect_image_format("/photos/sunset.jpg");
+    // Supports PNG, JPEG, BMP, GIF with proper validation
+
+**Advanced Image Display**
+
+    // Simple image display chinScreen_image("/photos/landscape.png",  50,  50); // Advanced configuration with effects chinScreen_img_config_t config = chinScreen_default_img_config; config.rotation_angle =  45; config.opacity =  128; config.clickable =  true; lv_obj_t* img =  chinScreen_image_advanced("/photos/portrait.jpg",  -1,  -1,  200,  150,  &config); // Specialized functions chinScreen_image_scaled("/photos/logo.png",  100,  100,  true); chinScreen_image_rotated("/photos/diagram.png",  90); chinScreen_image_transparent("/photos/overlay.png",  50);
+
+Interactive Image Buttons (LVGL Native)
+
+    // Multi-state image buttons chinScreen_image_button_advanced("/icons/play.png",  "/icons/play_pressed.png", "/icons/play_disabled.png", callback); // Toggle image buttons chinScreen_toggle_image_button("/icons/sound_off.png",  "/icons/sound_on.png",  false, callback);
+
+**Full-Featured Image Gallery**
+
+    // Auto-scanning folder gallery with controls lv_obj_t* gallery =  chinScreen_image_gallery("/photos",  "*",  400,  300,  true,  true,  3); // Gallery controls chinScreen_gallery_next(); chinScreen_gallery_previous(); chinScreen_gallery_goto(5); chinScreen_gallery_toggle_slideshow();
+
+**Thumbnail Grid System**
+
+    // Create clickable thumbnail grid lv_obj_t* thumbs =  chinScreen_thumbnail_grid("/photos",  64,  4,  3, thumbnail_callback); // Example callback to open full image void  thumbnail_callback(lv_event_t* e)  { const  char* path =  chinScreen_thumbnail_get_path(e); chinScreen_image(path);  // Show full size }
+
+**System Icons with Fallbacks**
+
+    // Predefined system icons with automatic fallbacks lv_obj_t* home_icon =  chinScreen_get_icon("home",  32); lv_obj_t* play_btn =  chinScreen_icon_button("play", play_callback,  48); // Supported icons: home, settings, back, forward, play, pause, stop, // volume, wifi, battery
+
+**Visual Effects and Processing**
+
+    // Dynamic image effects chinScreen_image_set_opacity(img,  75); chinScreen_image_set_rotation(img,  45); chinScreen_image_set_zoom(img,  150); chinScreen_image_add_frame(img,  "gold",  5); chinScreen_image_add_shadow(img,  "black",  10); // Overlay/watermark system chinScreen_image_add_overlay(base_img,  "/watermark.png",  "bottom_right",  50);
+    
+**Advanced Features**
+
+    // Side-by-side image comparison chinScreen_image_compare("/before.jpg",  "/after.jpg"); // Image caching for performance chinScreen_cache_image("/frequently_used.png"); // Get detailed image information chinScreen_image_get_info("/photos/test.jpg");
+    
+**Usage Example:**
+
+    #include <chinScreen.h>
+    
+    void photo_clicked(lv_event_t* e) {
+        const char* photo_path = chinScreen_thumbnail_get_path(e);
+        Serial.printf("Opening: %s\n", photo_path);
+        
+        // Close thumbnails and open gallery
+        chinScreen_clear();
+        chinScreen_image_gallery(photo_path, "*", 400, 300, true, true, 5);
+    }
+    
+    void setup() {
+        chinScreen_init_display();
+        chinScreen_init_commands();  // For SD card
+        chinScreen_init_images();    // Load images module
+        
+        // Initialize SD card with image support
+        chinScreen_init_sd_card();
+        
+        // Create thumbnail grid of photos
+        lv_obj_t* thumbnails = chinScreen_thumbnail_grid("/photos", 80, 4, 2, photo_clicked);
+        
+        // Add navigation icons
+        lv_obj_t* home_btn = chinScreen_icon_button("home", nullptr, 40, "top", "left");
+        lv_obj_t* settings_btn = chinScreen_icon_button("settings", nullptr, 40, "top", "right");
+    }
+    
+    void loop() {
+        // Gallery auto-advances if slideshow is enabled
+    }
+
+
+
+
