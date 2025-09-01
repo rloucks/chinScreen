@@ -48,11 +48,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_SETTING
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41, 0x08, 0x41, 0x08, 0x41, 0x08, 0x41, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
 
-const lv_image_dsc_t settings = {
-  .header.cf = LV_COLOR_FORMAT_RGB565,
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
-  .header.w = 24,
-  .header.h = 24,
-  .data_size = 576 * 2,
-  .data = settings_map,
+const lv_img_dsc_t settings = {
+    .header.cf = LV_IMG_CF_TRUE_COLOR,          // Changed from LV_COLOR_FORMAT_RGB565
+    .header.always_zero = 0,                    // Added this field
+    .header.reserved = 0,                       // Added this field  
+    .header.w = 24,
+    .header.h = 24,
+    .data_size = 576 * 2,
+    .data = settings_map,
 };
