@@ -16,30 +16,5 @@
 > <img width="536" height="386" alt="image" src="https://github.com/user-attachments/assets/e92ab03c-7026-410d-8a15-3082b83bc8dd" />
 
 
-
-### Basic Function Documentation:
-
-**init_display()**\
-Starts the whole thing up
-
-**create_ui(int)**\
-Starts the UI, but allows for debugging\
-  0 = Nothing\
-  1 = Screen Text Test\
-  2 = Color Test
-
-**chinScreen_backlight(int)**\
-Backlight control I think\
-  0 = On\
-  1 = Off
-  
-**chinScreen_brightness(int)**\
-Set how bright the screen is\
-  0-255 control
-
-**chinScreen_rectangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
-**chinScreen_triangle(Background Color, Border Color, Width, Height, H Position, V Position);**\
-**chinScreen_circle(Background Color, Border Color, radius, H Position, V Position);**\
-
-<img width="377" height="578" alt="image" src="https://github.com/user-attachments/assets/6b3b12e1-1b45-4889-90c9-f3209ad7fb33" />
-
+**This version chinScreen has been updated to allow support for LVGL 9.3.0**
+See new documentation at https://github.com/rloucks/chinScreen/blob/images-wip/libraries/chinScreen/readme.md
