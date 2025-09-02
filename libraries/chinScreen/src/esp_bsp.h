@@ -6,7 +6,7 @@
 
 /**
  * @file
- * @brief ESP BSP: ESP-BOX-3 (LVGL 9.3.0 compatible)
+ * @brief ESP BSP: ESP-BOX-3 - Updated for LVGL 9.3.0
  */
 
 #pragma once
@@ -18,14 +18,17 @@
 #include "lv_port.h"
 
 /**************************************************************************************************
- *  Pinout
+ *  pinout
  **************************************************************************************************/
 #define BSP_I2C_NUM                     (I2C_NUM_0)
 #define BSP_I2C_CLK_SPEED_HZ            400000
 
 #define EXAMPLE_LCD_QSPI_HOST           (SPI2_HOST)
 
-/* LCD QSPI pins */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////// LCD spec of QSPI /////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define EXAMPLE_PIN_NUM_QSPI_CS         (GPIO_NUM_45)
 #define EXAMPLE_PIN_NUM_QSPI_PCLK       (GPIO_NUM_47)
 #define EXAMPLE_PIN_NUM_QSPI_DATA0      (GPIO_NUM_21)
@@ -37,7 +40,6 @@
 #define EXAMPLE_PIN_NUM_QSPI_TE         (GPIO_NUM_38)
 #define EXAMPLE_PIN_NUM_QSPI_BL         (GPIO_NUM_1)
 
-/* Touch (I2C over QSPI pins if available) */
 #define EXAMPLE_PIN_NUM_QSPI_TOUCH_SCL  (GPIO_NUM_8)
 #define EXAMPLE_PIN_NUM_QSPI_TOUCH_SDA  (GPIO_NUM_4)
 #define EXAMPLE_PIN_NUM_QSPI_TOUCH_RST  (-1)
@@ -48,16 +50,13 @@ extern "C" {
 #endif
 
 /**
- * @brief BSP display configuration structure (LVGL 9.x compatible)
+ * @brief BSP display configuration structure - Updated for LVGL 9.3.0
  *
- * Rotation is no longer in this struct; use lv_display_set_rotation()
- * after bsp_display_start_with_config() returns.
  */
 typedef struct {
-    lvgl_port_cfg_t lvgl_port_cfg;   /*!< LVGL port configuration */
-    uint32_t buffer_size;            /*!< LVGL draw buffer size (pixels) */
-    lvgl_port_rotation_t sw_rotate;  /*!< Software rotation for the panel */
-    // other members as needed
+    lvgl_port_cfg_t lvgl_port_cfg;          /*!< Configuration for the LVGL port */
+    uint32_t buffer_size;                    /*!< Size of the buffer for the screen in pixels */
+    lv_display_rotation_t rotate;            /*!< Rotation configuration for the display - UPDATED for LVGL 9.x */
 } bsp_display_cfg_t;
 
 /**
@@ -67,6 +66,7 @@ typedef struct {
  *      - ESP_OK                On success
  *      - ESP_ERR_INVALID_ARG   I2C parameter error
  *      - ESP_FAIL              I2C driver installation error
+ *
  */
 esp_err_t bsp_i2c_init(void);
 
@@ -76,40 +76,80 @@ esp_err_t bsp_i2c_init(void);
  * @return
  *      - ESP_OK                On success
  *      - ESP_ERR_INVALID_ARG   I2C parameter error
+ *
  */
 esp_err_t bsp_i2c_deinit(void);
 
 /**
- * @brief Initialize display
+ * @brief Initialize display - Updated for LVGL 9.3.0
  *
- * Initializes QSPI, display controller and starts LVGL handling task.
+ * This function initializes SPI, display controller and starts LVGL handling task.
  * LCD backlight must be enabled separately by calling bsp_display_brightness_set()
  *
  * @param cfg display configuration
- * @return Pointer to LVGL display or NULL on error
+ *
+ * @return Pointer to LVGL display or NULL when error occurred - UPDATED return type for LVGL 9.x
  */
-lv_disp_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg);
+lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg);
 
 /**
- * @brief Get pointer to LVGL input device (touch, buttons, ...)
+ * @brief Get pointer to input device (touch, buttons, ...)
  *
- * @note LVGL indev is initialized in bsp_display_start().
- * @return Pointer to LVGL input device or NULL if not initialized
+ * @note The LVGL input device is initialized in bsp_display_start() function.
+ *
+ * @return Pointer to LVGL input device or NULL when not initialized
  */
 lv_indev_t *bsp_display_get_input_dev(void);
 
 /**
  * @brief Take LVGL mutex
  *
- * @param timeout_ms Timeout in ms. 0 will block indefinitely.
- * @return true if mutex was taken, false otherwise
+ * @param timeout_ms Timeout in [ms]. 0 will block indefinitely.
+ * @return true  Mutex was taken
+ * @return false Mutex was NOT taken
  */
 bool bsp_display_lock(uint32_t timeout_ms);
 
 /**
  * @brief Give LVGL mutex
+ *
  */
 void bsp_display_unlock(void);
+
+/**
+ * @brief Set display's brightness
+ *
+ * Brightness is controlled with PWM signal to a pin controlling backlight.
+ * Display must be already initialized by calling bsp_display_new()
+ *
+ * @param[in] brightness_percent Brightness in [%]
+ * @return
+ *      - ESP_OK                On success
+ *      - ESP_ERR_INVALID_ARG   Parameter error
+ */
+esp_err_t bsp_display_brightness_set(int brightness_percent);
+
+/**
+ * @brief Turn on display backlight
+ *
+ * Display must be already initialized by calling bsp_display_new()
+ *
+ * @return
+ *      - ESP_OK                On success
+ *      - ESP_ERR_INVALID_ARG   Parameter error
+ */
+esp_err_t bsp_display_backlight_on(void);
+
+/**
+ * @brief Turn off display backlight
+ *
+ * Display must be already initialized by calling bsp_display_new()
+ *
+ * @return
+ *      - ESP_OK                On success
+ *      - ESP_ERR_INVALID_ARG   Parameter error
+ */
+esp_err_t bsp_display_backlight_off(void);
 
 #ifdef __cplusplus
 }
