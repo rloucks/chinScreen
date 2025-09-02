@@ -19,8 +19,10 @@
 #pragma once
 #include <Arduino.h>
 #include <lvgl.h>
+
+// Use your existing display and BSP headers
 #include "display.h"
-#include "esp_bsp.h"
+#include "esp_bsp.h" 
 #include "lv_port.h"
 #include <ctype.h>
 
@@ -39,21 +41,19 @@ static bool chinScreen_video_loaded = false;
 // Common definitions used across modules
 #define CHINSCREEN_MAX_COLORS 15
 
-// Font size constants (LVGL 9.3.0 compatible)
+// Font size constants - use whatever fonts are available in your LVGL
+#ifndef FONT_SMALL
 #define FONT_SMALL   &lv_font_montserrat_12
+#endif
+#ifndef FONT_MEDIUM
 #define FONT_MEDIUM  &lv_font_montserrat_16
+#endif
+#ifndef FONT_LARGE
 #define FONT_LARGE   &lv_font_montserrat_20
+#endif
+#ifndef FONT_XLARGE
 #define FONT_XLARGE  &lv_font_montserrat_24
-
-// Animation types
-typedef enum {
-    ANIM_MOVE_X,
-    ANIM_MOVE_Y,
-    ANIM_SCALE_X,
-    ANIM_SCALE_Y,
-    ANIM_ROTATE,
-    ANIM_FADE
-} chinScreen_anim_type_t;
+#endif
 
 // Button callback type
 typedef void (*chinScreen_btn_callback_t)(lv_event_t* e);
@@ -115,160 +115,42 @@ inline const lv_font_t* chinScreen_get_font(const char* size) {
 }
 
 //=============================================================================
-// CORE DISPLAY INITIALIZATION (Always Available)
+// CORE DISPLAY INITIALIZATION - Use your original working code
 //=============================================================================
 
-inline void chinScreen_init_display() {
-    Serial.println("chinScreen: Initialize panel device");
+// Use your existing init_display function exactly as it was
+inline void init_display() {
+    Serial.println("Initialize panel device");
 
     bsp_display_cfg_t cfg = {
         .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
         .buffer_size = EXAMPLE_LCD_QSPI_H_RES * EXAMPLE_LCD_QSPI_V_RES,
 #if LVGL_PORT_ROTATION_DEGREE == 90
-        .rotate = LV_DISPLAY_ROTATION_90,
+        .rotate = LV_DISP_ROT_90,
 #elif LVGL_PORT_ROTATION_DEGREE == 270
-        .rotate = LV_DISPLAY_ROTATION_270,
+        .rotate = LV_DISP_ROT_270,
 #elif LVGL_PORT_ROTATION_DEGREE == 180
-        .rotate = LV_DISPLAY_ROTATION_180,
+        .rotate = LV_DISP_ROT_180,
 #elif LVGL_PORT_ROTATION_DEGREE == 0
-        .rotate = LV_DISPLAY_ROTATION_0,
+        .rotate = LV_DISP_ROT_NONE,
 #endif
     };
 
     bsp_display_start_with_config(&cfg);
     bsp_display_backlight_on();
-    Serial.println("chinScreen: Display initialization complete");
+    Serial.println("Display init done");
 }
 
-// Backward compatibility alias
-inline void init_display() {
-    chinScreen_init_display();
-}
-
-//=============================================================================
-// MODULE INITIALIZATION FUNCTIONS
-//=============================================================================
-
-// Initialize commands module (screen management, backgrounds, etc.)
-inline bool chinScreen_init_commands() {
-    if (chinScreen_commands_loaded) {
-        Serial.println("chinScreen: Commands module already loaded");
-        return true;
-    }
-    
-    #include "chinScreen_commands.h"
-    chinScreen_commands_loaded = true;
-    Serial.println("chinScreen: Commands module loaded");
-    return true;
-}
-
-// Initialize shapes module (rectangles, circles, polygons, etc.)
-inline bool chinScreen_init_shapes() {
-    if (chinScreen_shapes_loaded) {
-        Serial.println("chinScreen: Shapes module already loaded");
-        return true;
-    }
-    
-    #include "chinScreen_shapes.h"
-    chinScreen_shapes_loaded = true;
-    Serial.println("chinScreen: Shapes module loaded");
-    return true;
-}
-
-// Initialize interface module (buttons, sliders, keyboards, etc.)
-inline bool chinScreen_init_interface() {
-    if (chinScreen_interface_loaded) {
-        Serial.println("chinScreen: Interface module already loaded");
-        return true;
-    }
-    
-    #include "chinScreen_interface.h"
-    chinScreen_interface_loaded = true;
-    Serial.println("chinScreen: Interface module loaded");
-    return true;
-}
-
-// Initialize images module (PNG, JPG, BMP support, etc.)
-inline bool chinScreen_init_images() {
-    if (chinScreen_images_loaded) {
-        Serial.println("chinScreen: Images module already loaded");
-        return true;
-    }
-    
-    #include "chinScreen_images.h"
-    chinScreen_images_loaded = true;
-    Serial.println("chinScreen: Images module loaded");
-    return true;
-}
-
-// Initialize video module (MJPEG support, etc.)
-inline bool chinScreen_init_video() {
-    if (chinScreen_video_loaded) {
-        Serial.println("chinScreen: Video module already loaded");
-        return true;
-    }
-    
-    #include "chinScreen_video.h"
-    chinScreen_video_loaded = true;
-    Serial.println("chinScreen: Video module loaded");
-    return true;
-}
-
-// Initialize all modules at once
-inline void chinScreen_init_all() {
-    Serial.println("chinScreen: Loading all modules...");
-    chinScreen_init_commands();
-    chinScreen_init_shapes();
-    chinScreen_init_interface();
-    chinScreen_init_images();
-    chinScreen_init_video();
-    Serial.println("chinScreen: All modules loaded");
+// New function that calls the original
+inline void chinScreen_init_display() {
+    init_display();
 }
 
 //=============================================================================
-// MODULE STATUS AND UTILITY FUNCTIONS
+// HELPER FUNCTIONS
 //=============================================================================
 
-// Check if a specific module is loaded
-inline bool chinScreen_is_module_loaded(const char* module_name) {
-    if (strcmp(module_name, "commands") == 0) return chinScreen_commands_loaded;
-    if (strcmp(module_name, "shapes") == 0) return chinScreen_shapes_loaded;
-    if (strcmp(module_name, "interface") == 0) return chinScreen_interface_loaded;
-    if (strcmp(module_name, "images") == 0) return chinScreen_images_loaded;
-    if (strcmp(module_name, "video") == 0) return chinScreen_video_loaded;
-    return false;
-}
-
-// Get library version as string
-inline const char* chinScreen_get_version() {
-    static char version_str[16];
-    snprintf(version_str, sizeof(version_str), "%d.%d.%d", 
-             CHINSCREEN_VERSION_MAJOR, 
-             CHINSCREEN_VERSION_MINOR, 
-             CHINSCREEN_VERSION_PATCH);
-    return version_str;
-}
-
-// Print module status
-inline void chinScreen_print_status() {
-    Serial.println("=== chinScreen Library Status ===");
-    Serial.printf("Version: %s\n", chinScreen_get_version());
-    Serial.printf("LVGL Version: %d.%d.%d\n", 
-                  LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
-    Serial.println("Loaded Modules:");
-    Serial.printf("  Commands: %s\n", chinScreen_commands_loaded ? "YES" : "NO");
-    Serial.printf("  Shapes: %s\n", chinScreen_shapes_loaded ? "YES" : "NO");
-    Serial.printf("  Interface: %s\n", chinScreen_interface_loaded ? "YES" : "NO");
-    Serial.printf("  Images: %s\n", chinScreen_images_loaded ? "YES" : "NO");
-    Serial.printf("  Video: %s\n", chinScreen_video_loaded ? "YES" : "NO");
-    Serial.println("================================");
-}
-
-//=============================================================================
-// LVGL 9.3.0 COMPATIBILITY HELPERS
-//=============================================================================
-
-// Helper for thread-safe display operations (LVGL 9.3.0 style)
+// Helper for thread-safe display operations
 inline void chinScreen_lock_display() {
     bsp_display_lock(0);
 }
@@ -277,7 +159,7 @@ inline void chinScreen_unlock_display() {
     bsp_display_unlock();
 }
 
-// LVGL 9.3.0 alignment helper
+// Alignment helper
 inline lv_align_t chinScreen_get_alignment(const char* vAlign, const char* hAlign) {
     if (strcmp(vAlign, "top") == 0) {
         if (strcmp(hAlign, "left") == 0) return LV_ALIGN_TOP_LEFT;
@@ -298,61 +180,211 @@ inline lv_align_t chinScreen_get_alignment(const char* vAlign, const char* hAlig
 }
 
 //=============================================================================
-// BACKWARD COMPATIBILITY WARNING SYSTEM
+// MODULE INITIALIZATION FUNCTIONS (Simple flag setting)
 //=============================================================================
 
-// Warn user about deprecated function usage
-inline void chinScreen_warn_deprecated(const char* old_func, const char* new_func) {
-    Serial.printf("WARNING: %s is deprecated. Use %s instead.\n", old_func, new_func);
+inline bool chinScreen_init_commands() {
+    if (chinScreen_commands_loaded) {
+        Serial.println("chinScreen: Commands module already loaded");
+        return true;
+    }
+    chinScreen_commands_loaded = true;
+    Serial.println("chinScreen: Commands module loaded");
+    return true;
 }
 
-// Legacy function detection - these will call the new modular functions
-// but with deprecation warnings
+inline bool chinScreen_init_shapes() {
+    if (chinScreen_shapes_loaded) {
+        Serial.println("chinScreen: Shapes module already loaded");
+        return true;
+    }
+    chinScreen_shapes_loaded = true;
+    Serial.println("chinScreen: Shapes module loaded");
+    return true;
+}
 
-inline void getColorByName_DEPRECATED(const char* name) {
-    chinScreen_warn_deprecated("getColorByName", "chinScreen_get_color");
+inline bool chinScreen_init_interface() {
+    if (chinScreen_interface_loaded) {
+        Serial.println("chinScreen: Interface module already loaded");
+        return true;
+    }
+    chinScreen_interface_loaded = true;
+    Serial.println("chinScreen: Interface module loaded");
+    return true;
+}
+
+inline bool chinScreen_init_images() {
+    if (chinScreen_images_loaded) {
+        Serial.println("chinScreen: Images module already loaded");
+        return true;
+    }
+    chinScreen_images_loaded = true;
+    Serial.println("chinScreen: Images module loaded");
+    return true;
+}
+
+inline bool chinScreen_init_video() {
+    if (chinScreen_video_loaded) {
+        Serial.println("chinScreen: Video module already loaded");
+        return true;
+    }
+    chinScreen_video_loaded = true;
+    Serial.println("chinScreen: Video module loaded");
+    return true;
 }
 
 //=============================================================================
-// EXAMPLE USAGE DOCUMENTATION
+// BASIC SHAPE FUNCTIONS (Compatible with your LVGL version)
 //=============================================================================
 
-/*
-=== chinScreen v1.0.0 - Modular Architecture Usage ===
-
-Basic Setup:
-#define LVGL_PORT_ROTATION_DEGREE 0
-#include <chinScreen.h>
-
-void setup() {
-    chinScreen_init_display();  // Always required
+// Clear screen
+inline void chinScreen_clear() {
+    chinScreen_lock_display();
     
-    // Load only the modules you need:
-    chinScreen_init_commands();   // For screen management, backgrounds
-    chinScreen_init_shapes();     // For rectangles, circles, etc.
-    chinScreen_init_interface();  // For buttons, sliders, keyboards
-    chinScreen_init_images();     // For PNG/JPG display
-    chinScreen_init_video();      // For video playback
+    lv_obj_t *scr = lv_scr_act();
+    lv_obj_clean(scr);
     
-    // Or load everything:
-    // chinScreen_init_all();
+    // Reset background to black
+    lv_obj_set_style_bg_color(scr, lv_color_make(0, 0, 0), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
     
-    // Check status:
-    chinScreen_print_status();
+    chinScreen_unlock_display();
 }
 
-Module Functions:
-- Commands: chinScreen_clear(), chinScreen_background_solid(), chinScreen_brightness()
-- Shapes: chinScreen_rectangle(), chinScreen_circle(), chinScreen_triangle()  
-- Interface: chinScreen_button(), chinScreen_slider(), chinScreen_keyboard()
-- Images: chinScreen_image(), chinScreen_image_button()
-- Video: chinScreen_video_load(), chinScreen_video_play()
+// Set background color
+inline void chinScreen_background_solid(const char* colorName) {
+    chinScreen_lock_display();
+    
+    lv_obj_t *scr = lv_scr_act();
+    lv_obj_set_style_bg_color(scr, chinScreen_get_color(colorName), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+    
+    chinScreen_unlock_display();
+}
 
-LVGL 9.3.0 Updates:
-- Thread-safe operations with chinScreen_lock_display()/chinScreen_unlock_display()
-- Updated rotation constants (LV_DISPLAY_ROTATION_*)
-- Improved memory management
-- Better alignment system with chinScreen_get_alignment()
+// Simple rectangle function
+inline lv_obj_t* chinScreen_rectangle(const char* fillColor,
+                                     const char* borderColor,
+                                     int width, int height,
+                                     const char* vAlign = "middle",
+                                     const char* hAlign = "center") {
+    chinScreen_lock_display();
 
-========================================================
-*/
+    lv_obj_t *rect = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(rect, width, height);
+    
+    // Apply colors
+    lv_obj_set_style_bg_color(rect, chinScreen_get_color(fillColor), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(rect, chinScreen_get_color(borderColor), LV_PART_MAIN);
+    lv_obj_set_style_border_width(rect, 3, LV_PART_MAIN);
+    lv_obj_set_style_border_opa(rect, LV_OPA_COVER, LV_PART_MAIN);
+
+    // Position the rectangle
+    lv_align_t align = chinScreen_get_alignment(vAlign, hAlign);
+    lv_obj_align(rect, align, 0, 0);
+
+    chinScreen_unlock_display();
+    return rect;
+}
+
+// Simple circle function
+inline lv_obj_t* chinScreen_circle(const char* fillColor, 
+                                  const char* borderColor, 
+                                  int radius, 
+                                  const char* vAlign = "middle", 
+                                  const char* hAlign = "center") {
+    chinScreen_lock_display();
+
+    lv_obj_t *circle = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(circle, radius * 2, radius * 2);
+    
+    lv_obj_set_style_bg_color(circle, chinScreen_get_color(fillColor), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(circle, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(circle, chinScreen_get_color(borderColor), LV_PART_MAIN);
+    lv_obj_set_style_border_width(circle, 3, LV_PART_MAIN);
+    lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, LV_PART_MAIN);
+
+    // Position
+    lv_align_t align = chinScreen_get_alignment(vAlign, hAlign);
+    lv_obj_align(circle, align, 0, 0);
+
+    chinScreen_unlock_display();
+    return circle;
+}
+
+// Simple text function
+inline lv_obj_t* chinScreen_text(const char* text, 
+                                int x, int y, 
+                                const char* colorName = "white", 
+                                const char* fontSize = "medium") {
+    chinScreen_lock_display();
+
+    lv_obj_t *label = lv_label_create(lv_scr_act());
+    lv_label_set_text(label, text);
+    lv_obj_set_style_text_color(label, chinScreen_get_color(colorName), LV_PART_MAIN);
+    lv_obj_set_style_text_font(label, chinScreen_get_font(fontSize), LV_PART_MAIN);
+    lv_obj_set_pos(label, x, y);
+
+    chinScreen_unlock_display();
+    return label;
+}
+
+// Simple button function
+inline lv_obj_t* chinScreen_button(const char* text,
+                                  chinScreen_btn_callback_t callback,
+                                  const char* vAlign = "middle",
+                                  const char* hAlign = "center",
+                                  int width = 100,
+                                  int height = 50) {
+    chinScreen_lock_display();
+
+    lv_obj_t *btn = lv_btn_create(lv_scr_act());
+    lv_obj_set_size(btn, width, height);
+
+    // Add text label if provided
+    if (text && strlen(text) > 0) {
+        lv_obj_t *label = lv_label_create(btn);
+        lv_label_set_text(label, text);
+        lv_obj_center(label);
+    }
+
+    // Add event callback
+    if (callback) {
+        lv_obj_add_event_cb(btn, callback, LV_EVENT_CLICKED, NULL);
+    }
+
+    // Position button
+    lv_align_t align = chinScreen_get_alignment(vAlign, hAlign);
+    lv_obj_align(btn, align, 0, 0);
+
+    chinScreen_unlock_display();
+    return btn;
+}
+
+//=============================================================================
+// UTILITY FUNCTIONS
+//=============================================================================
+
+// Get library version as string
+inline const char* chinScreen_get_version() {
+    static char version_str[16];
+    snprintf(version_str, sizeof(version_str), "%d.%d.%d", 
+             CHINSCREEN_VERSION_MAJOR, 
+             CHINSCREEN_VERSION_MINOR, 
+             CHINSCREEN_VERSION_PATCH);
+    return version_str;
+}
+
+// Print module status
+inline void chinScreen_print_status() {
+    Serial.println("=== chinScreen Library Status ===");
+    Serial.printf("Version: %s\n", chinScreen_get_version());
+    Serial.println("Loaded Modules:");
+    Serial.printf("  Commands: %s\n", chinScreen_commands_loaded ? "YES" : "NO");
+    Serial.printf("  Shapes: %s\n", chinScreen_shapes_loaded ? "YES" : "NO");
+    Serial.printf("  Interface: %s\n", chinScreen_interface_loaded ? "YES" : "NO");
+    Serial.printf("  Images: %s\n", chinScreen_images_loaded ? "YES" : "NO");
+    Serial.printf("  Video: %s\n", chinScreen_video_loaded ? "YES" : "NO");
+    Serial.println("================================");
+}

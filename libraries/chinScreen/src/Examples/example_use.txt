@@ -1,0 +1,199 @@
+//=============================================================================
+// EXAMPLE USAGE DOCUMENTATION
+//=============================================================================
+
+/*
+=== chinScreen v1.0.0 - Modular Architecture Usage ===
+
+Basic Setup:
+#define LVGL_PORT_ROTATION_DEGREE 0
+#include <chinScreen.h>
+
+void setup() {
+    chinScreen_init_display();  // Always required
+    
+    // Load only the modules you need:
+    chinScreen_init_commands();   // For screen management, backgrounds
+    chinScreen_init_shapes();     // For rectangles, circles, etc.
+    chinScreen_init_interface();  // For buttons, sliders, keyboards
+    chinScreen_init_images();     // For PNG/JPG display
+    chinScreen_init_video();      // For video playback
+    
+    // Or load everything:
+    // chinScreen_init_all();
+    
+    // Check status:
+    chinScreen_print_status();
+}
+
+Module Functions:
+- Commands: chinScreen_clear(), chinScreen_background_solid(), chinScreen_brightness()
+- Shapes: chinScreen_rectangle(), chinScreen_circle(), chinScreen_triangle()  
+- Interface: chinScreen_button(), chinScreen_slider(), chinScreen_keyboard()
+- Images: chinScreen_image(), chinScreen_image_button()
+- Video: chinScreen_video_load(), chinScreen_video_play()
+
+LVGL 9.3.0 Updates:
+- Thread-safe operations with chinScreen_lock_display()/chinScreen_unlock_display()
+- Updated rotation constants (LV_DISPLAY_ROTATION_*)
+- Improved memory management
+- Better alignment system with chinScreen_get_alignment()
+
+//=============================================================================
+// MODULE IMPLEMENTATIONS - Inline module code
+//=============================================================================
+
+// Commands Module Implementation
+#ifndef CHINSCREEN_COMMANDS_LOADED
+#define CHINSCREEN_COMMANDS_LOADED
+
+// Safe screen clearing
+inline void chinScreen_clear() {
+    chinScreen_lock_display();
+    
+    lv_obj_t *scr = lv_scr_act();  // Use older LVGL function name
+    lv_obj_clean(scr);
+    
+    // Reset background to black
+    lv_obj_set_style_bg_color(scr, lv_color_make(0, 0, 0), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_bg_grad_dir(scr, LV_GRAD_DIR_NONE, LV_PART_MAIN);
+    lv_obj_invalidate(scr);
+    
+    chinScreen_unlock_display();
+}
+
+// Set solid background color
+inline void chinScreen_background_solid(const char* colorName) {
+    chinScreen_lock_display();
+    
+    lv_obj_t *scr = lv_scr_act();  // Use older LVGL function name
+    lv_obj_set_style_bg_color(scr, chinScreen_get_color(colorName), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_bg_grad_dir(scr, LV_GRAD_DIR_NONE, LV_PART_MAIN);
+    
+    chinScreen_unlock_display();
+}
+
+#endif // CHINSCREEN_COMMANDS_LOADED
+
+// Shapes Module Implementation  
+#ifndef CHINSCREEN_SHAPES_LOADED
+#define CHINSCREEN_SHAPES_LOADED
+
+// Simple rectangle function
+inline lv_obj_t* chinScreen_rectangle(const char* fillColor,
+                                     const char* borderColor,
+                                     int width, int height,
+                                     const char* vAlign = "middle",
+                                     const char* hAlign = "center") {
+    chinScreen_lock_display();
+
+    lv_obj_t *rect = lv_obj_create(lv_scr_act());  // Use older LVGL function
+    lv_obj_set_size(rect, width, height);
+    
+    // Apply colors
+    lv_obj_set_style_bg_color(rect, chinScreen_get_color(fillColor), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(rect, chinScreen_get_color(borderColor), LV_PART_MAIN);
+    lv_obj_set_style_border_width(rect, 3, LV_PART_MAIN);
+    lv_obj_set_style_border_opa(rect, LV_OPA_COVER, LV_PART_MAIN);
+
+    // Position the rectangle
+    lv_align_t align = chinScreen_get_alignment(vAlign, hAlign);
+    lv_obj_align(rect, align, 0, 0);
+
+    chinScreen_unlock_display();
+    return rect;
+}
+
+// Simple circle function
+inline lv_obj_t* chinScreen_circle(const char* fillColor, 
+                                  const char* borderColor, 
+                                  int radius, 
+                                  const char* vAlign = "middle", 
+                                  const char* hAlign = "center") {
+    chinScreen_lock_display();
+
+    lv_obj_t *circle = lv_obj_create(lv_scr_act());  // Use older LVGL function
+    lv_obj_set_size(circle, radius * 2, radius * 2);
+    
+    lv_obj_set_style_bg_color(circle, chinScreen_get_color(fillColor), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(circle, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(circle, chinScreen_get_color(borderColor), LV_PART_MAIN);
+    lv_obj_set_style_border_width(circle, 3, LV_PART_MAIN);
+    lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, LV_PART_MAIN);
+
+    // Position
+    lv_align_t align = chinScreen_get_alignment(vAlign, hAlign);
+    lv_obj_align(circle, align, 0, 0);
+
+    chinScreen_unlock_display();
+    return circle;
+}
+
+#endif // CHINSCREEN_SHAPES_LOADED
+
+//=============================================================================
+// MODULE INITIALIZATION IMPLEMENTATIONS
+//=============================================================================
+
+// Initialize commands module (screen management, backgrounds, etc.)
+inline bool chinScreen_init_commands() {
+    if (chinScreen_commands_loaded) {
+        Serial.println("chinScreen: Commands module already loaded");
+        return true;
+    }
+    
+    chinScreen_commands_loaded = true;
+    Serial.println("chinScreen: Commands module loaded");
+    return true;
+}
+
+// Initialize shapes module (rectangles, circles, polygons, etc.)
+inline bool chinScreen_init_shapes() {
+    if (chinScreen_shapes_loaded) {
+        Serial.println("chinScreen: Shapes module already loaded");
+        return true;
+    }
+    
+    chinScreen_shapes_loaded = true;
+    Serial.println("chinScreen: Shapes module loaded");
+    return true;
+}
+
+// Initialize interface module (buttons, sliders, keyboards, etc.)
+inline bool chinScreen_init_interface() {
+    if (chinScreen_interface_loaded) {
+        Serial.println("chinScreen: Interface module already loaded");
+        return true;
+    }
+    
+    chinScreen_interface_loaded = true;
+    Serial.println("chinScreen: Interface module loaded");
+    return true;
+}
+
+// Initialize images module (PNG, JPG, BMP support, etc.)
+inline bool chinScreen_init_images() {
+    if (chinScreen_images_loaded) {
+        Serial.println("chinScreen: Images module already loaded");
+        return true;
+    }
+    
+    chinScreen_images_loaded = true;
+    Serial.println("chinScreen: Images module loaded");
+    return true;
+}
+
+// Initialize video module (MJPEG support, etc.)
+inline bool chinScreen_init_video() {
+    if (chinScreen_video_loaded) {
+        Serial.println("chinScreen: Video module already loaded");
+        return true;
+    }
+    
+    chinScreen_video_loaded = true;
+    Serial.println("chinScreen: Video module loaded");
+    return true;
+}
