@@ -55,6 +55,11 @@ static bool chinScreen_video_loaded = false;
 #define FONT_XLARGE  &lv_font_montserrat_24
 #endif
 
+// User can define this in their sketch before including chinScreen.h
+#ifndef LVGL_PORT_ROTATION_DEGREE
+#define LVGL_PORT_ROTATION_DEGREE 0
+#endif
+
 // Button callback type
 typedef void (*chinScreen_btn_callback_t)(lv_event_t* e);
 
@@ -118,22 +123,27 @@ inline const lv_font_t* chinScreen_get_font(const char* size) {
 // CORE DISPLAY INITIALIZATION - Use your original working code
 //=============================================================================
 
-// Use your existing init_display function exactly as it was
+
+// Corrected init_display function
 inline void init_display() {
     Serial.println("Initialize panel device");
+
+#if LVGL_PORT_ROTATION_DEGREE == 0
+    lvgl_port_rotation_t rot = LVGL_PORT_ROTATE_NONE;
+#elif LVGL_PORT_ROTATION_DEGREE == 90
+    lvgl_port_rotation_t rot = LVGL_PORT_ROTATE_90;
+#elif LVGL_PORT_ROTATION_DEGREE == 180
+    lvgl_port_rotation_t rot = LVGL_PORT_ROTATE_180;
+#elif LVGL_PORT_ROTATION_DEGREE == 270
+    lvgl_port_rotation_t rot = LVGL_PORT_ROTATE_270;
+#else
+    #error "LVGL_PORT_ROTATION_DEGREE must be 0, 90, 180, or 270"
+#endif
 
     bsp_display_cfg_t cfg = {
         .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
         .buffer_size = EXAMPLE_LCD_QSPI_H_RES * EXAMPLE_LCD_QSPI_V_RES,
-#if LVGL_PORT_ROTATION_DEGREE == 90
-        .rotate = LV_DISP_ROT_90,
-#elif LVGL_PORT_ROTATION_DEGREE == 270
-        .rotate = LV_DISP_ROT_270,
-#elif LVGL_PORT_ROTATION_DEGREE == 180
-        .rotate = LV_DISP_ROT_180,
-#elif LVGL_PORT_ROTATION_DEGREE == 0
-        .rotate = LV_DISP_ROT_NONE,
-#endif
+        .sw_rotate = rot,
     };
 
     bsp_display_start_with_config(&cfg);
@@ -141,11 +151,10 @@ inline void init_display() {
     Serial.println("Display init done");
 }
 
-// New function that calls the original
+// Optional helper function
 inline void chinScreen_init_display() {
     init_display();
 }
-
 //=============================================================================
 // HELPER FUNCTIONS
 //=============================================================================

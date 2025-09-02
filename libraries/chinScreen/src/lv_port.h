@@ -26,6 +26,16 @@ extern "C" {
 typedef bool (*lvgl_port_wait_cb)(void *handle);
 
 /**
+ * @brief LVGL software rotation options
+ */
+typedef enum {
+    LVGL_PORT_ROTATE_NONE = 0,   /*!< No rotation */
+    LVGL_PORT_ROTATE_90,         /*!< 90 degrees clockwise */
+    LVGL_PORT_ROTATE_180,        /*!< 180 degrees */
+    LVGL_PORT_ROTATE_270         /*!< 270 degrees clockwise */
+} lvgl_port_rotation_t;
+
+/**
  * @brief LVGL port initialization configuration
  */
 typedef struct {
@@ -44,11 +54,11 @@ typedef struct {
     esp_lcd_panel_handle_t panel_handle;    /*!< LCD panel handle */
     lvgl_port_wait_cb draw_wait_cb;         /*!< Optional callback to wait for drawing completion */
 
-    uint32_t buffer_size;    /*!< LVGL draw buffer size (pixels) */
-    uint32_t trans_size;     /*!< Size for transfer buffer (pixels) */
-    uint32_t hres;           /*!< Horizontal resolution of the display */
-    uint32_t vres;           /*!< Vertical resolution of the display */
-    lv_disp_rot_t sw_rotate; /*!< Panel software rotation */
+    uint32_t buffer_size;       /*!< LVGL draw buffer size (pixels) */
+    uint32_t trans_size;        /*!< Size for transfer buffer (pixels) */
+    uint32_t hres;              /*!< Horizontal resolution of the display */
+    uint32_t vres;              /*!< Vertical resolution of the display */
+    lvgl_port_rotation_t sw_rotate; /*!< Software rotation */
 
     struct {
         unsigned int buff_dma: 1;    /*!< Allocate LVGL buffer as DMA-capable */

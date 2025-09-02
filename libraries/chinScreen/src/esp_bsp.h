@@ -54,8 +54,10 @@ extern "C" {
  * after bsp_display_start_with_config() returns.
  */
 typedef struct {
-    lvgl_port_cfg_t lvgl_port_cfg;  /*!< Configuration for LVGL port */
-    uint32_t buffer_size;           /*!< Buffer size in pixels */
+    lvgl_port_cfg_t lvgl_port_cfg;   /*!< LVGL port configuration */
+    uint32_t buffer_size;            /*!< LVGL draw buffer size (pixels) */
+    lvgl_port_rotation_t sw_rotate;  /*!< Software rotation for the panel */
+    // other members as needed
 } bsp_display_cfg_t;
 
 /**
