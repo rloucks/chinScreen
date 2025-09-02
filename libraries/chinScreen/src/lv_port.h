@@ -159,6 +159,13 @@ bool lvgl_port_lock(uint32_t timeout_ms);
  */
 void lvgl_port_unlock(void);
 
+/**
+ * @brief Signal that flushing is ready
+ *
+ * @param disp LVGL display handle
+ */
+void lvgl_port_flush_ready(lv_display_t *disp);
+
 #ifdef __cplusplus
 }
 #endif
