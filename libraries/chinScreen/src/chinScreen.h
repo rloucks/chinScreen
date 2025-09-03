@@ -38,6 +38,8 @@ static bool chinScreen_interface_loaded = false;
 static bool chinScreen_images_loaded = false;
 static bool chinScreen_video_loaded = false;
 
+static lv_display_t *chinScreen_display = NULL;
+
 // Common definitions used across modules
 #define CHINSCREEN_MAX_COLORS 15
 
@@ -129,31 +131,59 @@ inline void init_display() {
 
     bsp_display_cfg_t cfg = {
         .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
-        .buffer_size = EXAMPLE_LCD_QSPI_H_RES * EXAMPLE_LCD_QSPI_V_RES,
+        .buffer_size = 320 * 40,  // Use smaller buffer that worked before
+#if LVGL_PORT_ROTATION_DEGREE == 90
+        .rotate = LV_DISPLAY_ROTATION_90,
+#elif LVGL_PORT_ROTATION_DEGREE == 270
+        .rotate = LV_DISPLAY_ROTATION_270,
+#elif LVGL_PORT_ROTATION_DEGREE == 180
+        .rotate = LV_DISPLAY_ROTATION_180,
+#elif LVGL_PORT_ROTATION_DEGREE == 0
+        .rotate = LV_DISPLAY_ROTATION_0,
+#endif
     };
 
-    lv_display_t *disp = bsp_display_start_with_config(&cfg);
+    lv_display_t* disp = bsp_display_start_with_config(&cfg);  // LVGL 9.x uses lv_display_t*
+    if (disp == NULL) {
+        Serial.println("Failed to initialize display!");
+        return;
+    }
+    
     bsp_display_backlight_on();
-
-    // Apply rotation
-#if LVGL_PORT_ROTATION_DEGREE == 0
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
-#elif LVGL_PORT_ROTATION_DEGREE == 90
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
-#elif LVGL_PORT_ROTATION_DEGREE == 180
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
-#elif LVGL_PORT_ROTATION_DEGREE == 270
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
-#else
-    #error "LVGL_PORT_ROTATION_DEGREE must be 0, 90, 180, or 270"
-#endif
-
     Serial.println("Display init done");
 }
 
 // Optional helper function
 inline void chinScreen_init_display() {
     init_display();
+}
+
+inline void init_display_simple() {
+    Serial.println("Initialize panel device - Simple version");
+
+    // Initialize LVGL first
+    lv_init();
+    
+    Serial.println("LVGL initialized");
+    
+    // Create a basic display (this is a simplified approach)
+    lv_display_t *disp = lv_display_create(320, 480);
+    if (disp == NULL) {
+        Serial.println("Failed to create LVGL display!");
+        return;
+    }
+    
+    // Allocate draw buffer
+    static lv_color_t buf1[320 * 40]; // 40 lines buffer
+    lv_display_set_buffers(disp, buf1, NULL, sizeof(buf1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    
+    // Set a dummy flush callback for now
+    lv_display_set_flush_cb(disp, [](lv_display_t *disp, const lv_area_t *area, uint8_t *px_map) {
+        // Dummy flush - just tell LVGL we're done
+        lv_display_flush_ready(disp);
+    });
+
+    Serial.println("Display init done - Simple version");
 }
 //=============================================================================
 // HELPER FUNCTIONS

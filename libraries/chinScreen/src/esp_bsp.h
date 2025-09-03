@@ -6,7 +6,7 @@
 
 /**
  * @file
- * @brief ESP BSP: ESP-BOX-3 - Updated for LVGL 9.3.0
+ * @brief ESP BSP: ESP-BOX-3 - Updated for LVGL 9.x
  */
 
 #pragma once
@@ -48,15 +48,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /**
- * @brief BSP display configuration structure - Updated for LVGL 9.3.0
+ * @brief BSP display configuration structure - Updated for LVGL 9.x
  *
  */
 typedef struct {
     lvgl_port_cfg_t lvgl_port_cfg;          /*!< Configuration for the LVGL port */
-    uint32_t buffer_size;                    /*!< Size of the buffer for the screen in pixels */
-    lv_display_rotation_t rotate;            /*!< Rotation configuration for the display - UPDATED for LVGL 9.x */
+    uint32_t buffer_size;                   /*!< Size of the buffer for the screen in pixels */
+    lv_display_rotation_t rotate;           /*!< Rotation configuration for the display - UPDATED for LVGL 9.x */
 } bsp_display_cfg_t;
 
 /**
@@ -81,7 +80,7 @@ esp_err_t bsp_i2c_init(void);
 esp_err_t bsp_i2c_deinit(void);
 
 /**
- * @brief Initialize display - Updated for LVGL 9.3.0
+ * @brief Initialize display - Updated for LVGL 9.x
  *
  * This function initializes SPI, display controller and starts LVGL handling task.
  * LCD backlight must be enabled separately by calling bsp_display_brightness_set()
