@@ -66,7 +66,6 @@ static const axs15231b_lcd_init_cmd_t lcd_init_cmds[] = {
     {0x11, (uint8_t []){0x00}, 0, 120},
     {0x2C, (uint8_t []){0x00, 0x00, 0x00, 0x00}, 4, 0},
 };
-
 // Global handles
 static lv_display_t *disp = NULL;  // LVGL 9.x uses lv_display_t
 static lv_indev_t *disp_indev = NULL;
@@ -200,13 +199,13 @@ lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg)
     }
 
     ESP_LOGI(TAG, "Install LCD driver");
-    const axs15231b_vendor_config_t vendor_config = {
-        .init_cmds = lcd_init_cmds,
-        .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(lcd_init_cmds[0]),
-        .flags = {
-            .use_qspi_interface = 1,
-        },
-    };
+const axs15231b_vendor_config_t vendor_config = {
+    .init_cmds = lcd_init_cmds,                    // Use the full command set
+    .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(lcd_init_cmds[0]), // All 30 commands
+    .flags = {
+        .use_qspi_interface = 1,
+    },
+};
     const esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = EXAMPLE_PIN_NUM_QSPI_RST,
         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
