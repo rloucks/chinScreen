@@ -64,7 +64,6 @@ static const axs15231b_lcd_init_cmd_t lcd_init_cmds[] = {
     {0xBB, (uint8_t []){0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 8, 0},
     {0x13, (uint8_t []){0x00}, 0, 0},
     {0x11, (uint8_t []){0x00}, 0, 120},
-    {0x29, (uint8_t []){0x00}, 0, 20},  // Display ON command - CRITICAL FIX
     {0x2C, (uint8_t []){0x00, 0x00, 0x00, 0x00}, 4, 0},
 };
 
@@ -234,7 +233,7 @@ lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg)
     lvgl_port_display_cfg_t disp_cfg = {
         .io_handle = io_handle,
         .panel_handle = panel_handle,
-        .buffer_size = cfg->buffer_size,
+        .buffer_size = 320 * 80,
         .hres = hres,
         .vres = vres,
         .sw_rotate = (lv_display_rotation_t)cfg->rotate,
