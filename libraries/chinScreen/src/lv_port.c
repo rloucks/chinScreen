@@ -106,16 +106,12 @@ static void lvgl_port_flush_callback(lv_display_t *disp, const lv_area_t *area, 
 
     // Direct draw to panel hardware (this should work based on your working BSP)
     ESP_LOGI(TAG, "Calling esp_lcd_panel_draw_bitmap");
-    esp_err_t ret = esp_lcd_panel_draw_bitmap(disp_ctx->panel_handle,
-                                              x_start, y_start,
-                                              x_end + 1, y_end + 1,
-                                              (uint16_t *)px_map);
+	esp_lcd_panel_draw_bitmap(disp_ctx->panel_handle,
+                         x_start, y_start,
+                         x_end + 1, y_end + 1,
+                         (void *)px_map);  // Remove uint16_t cast
     
-    if (ret == ESP_OK) {
-        ESP_LOGI(TAG, "Hardware draw SUCCESS");
-    } else {
-        ESP_LOGE(TAG, "Hardware draw FAILED: %s", esp_err_to_name(ret));
-    }
+
 
     /* Inform LVGL the flush is done */
     lv_display_flush_ready(disp);
@@ -251,9 +247,9 @@ lv_display_t *lvgl_port_add_disp(const lvgl_port_display_cfg_t *disp_cfg)
     lv_display_set_rotation(disp, disp_ctx->sw_rotate);
     
     /* Set buffers - CORRECTED for LVGL 9.x */
-    lv_display_set_buffers(disp, disp_ctx->buf1_ptr, NULL, 
-                          (uint32_t)disp_cfg->buffer_size, 
-                          LV_DISPLAY_RENDER_MODE_PARTIAL);
+	lv_display_set_buffers(disp, disp_ctx->buf1_ptr, NULL, 
+                      (uint32_t)(disp_cfg->buffer_size * sizeof(lv_color_t)), 
+                      LV_DISPLAY_RENDER_MODE_PARTIAL);
     ESP_LOGI(TAG, "Display buffers configured");
     
     /* Set flush callback */

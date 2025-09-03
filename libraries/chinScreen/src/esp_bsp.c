@@ -64,8 +64,10 @@ static const axs15231b_lcd_init_cmd_t lcd_init_cmds[] = {
     {0xBB, (uint8_t []){0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 8, 0},
     {0x13, (uint8_t []){0x00}, 0, 0},
     {0x11, (uint8_t []){0x00}, 0, 120},
+    {0x29, (uint8_t []){0x00}, 0, 20},  // Display ON command - CRITICAL FIX
     {0x2C, (uint8_t []){0x00, 0x00, 0x00, 0x00}, 4, 0},
 };
+
 // Global handles
 static lv_display_t *disp = NULL;  // LVGL 9.x uses lv_display_t
 static lv_indev_t *disp_indev = NULL;
@@ -199,13 +201,13 @@ lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg)
     }
 
     ESP_LOGI(TAG, "Install LCD driver");
-const axs15231b_vendor_config_t vendor_config = {
-    .init_cmds = lcd_init_cmds,                    // Use the full command set
-    .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(lcd_init_cmds[0]), // All 30 commands
-    .flags = {
-        .use_qspi_interface = 1,
-    },
-};
+    const axs15231b_vendor_config_t vendor_config = {
+        .init_cmds = lcd_init_cmds,                    // Use the full command set
+        .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(lcd_init_cmds[0]), // All commands
+        .flags = {
+            .use_qspi_interface = 1,
+        },
+    };
     const esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = EXAMPLE_PIN_NUM_QSPI_RST,
         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
@@ -217,13 +219,17 @@ const axs15231b_vendor_config_t vendor_config = {
         return NULL;
     }
 
+    ESP_LOGI(TAG, "Initializing LCD panel...");
     esp_lcd_panel_reset(panel_handle);
     esp_lcd_panel_init(panel_handle);
+    
+    // CRITICAL: Turn on the display - this was missing!
     esp_lcd_panel_disp_on_off(panel_handle, true);
+    ESP_LOGI(TAG, "LCD panel turned ON");
 
     ESP_LOGI(TAG, "Add LCD screen to LVGL 9.x");
     
-    // Configure for LVGL 9.x
+    // Configure for LVGL 9.x - use smaller buffer size that worked before
     ESP_LOGI(TAG, "Configuring LVGL display with buffer size: %d", cfg->buffer_size);
     lvgl_port_display_cfg_t disp_cfg = {
         .io_handle = io_handle,
@@ -231,24 +237,13 @@ const axs15231b_vendor_config_t vendor_config = {
         .buffer_size = cfg->buffer_size,
         .hres = hres,
         .vres = vres,
-        .sw_rotate = (lv_display_rotation_t)cfg->rotate,  // Cast to LVGL 9.x rotation type
-        .trans_size = hres * vres / 10,
+        .sw_rotate = (lv_display_rotation_t)cfg->rotate,
+        .trans_size = 0,  // Disable transport buffers for now
         .flags = {
             .buff_dma = false,
             .buff_spiram = true,
         },
     };
-
-    // Handle rotation for resolution
-  //  if (cfg->rotate == LV_DISP_ROT_180 || cfg->rotate == LV_DISP_ROT_NONE) {
-  //      disp_cfg.hres = hres;
-  //      disp_cfg.vres = vres;
-  //      ESP_LOGI(TAG, "No rotation or 180°: using %dx%d", hres, vres);
-  //  } else {
-  //      disp_cfg.hres = vres;
-  //      disp_cfg.vres = hres;
-  //      ESP_LOGI(TAG, "90°/270° rotation: using %dx%d", vres, hres);
-  //  }
 
     ESP_LOGI(TAG, "Calling lvgl_port_add_disp...");
     disp = lvgl_port_add_disp(&disp_cfg);
