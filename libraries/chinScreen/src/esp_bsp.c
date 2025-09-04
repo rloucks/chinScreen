@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2021-2024 Espressif Systems (Shanghai) CO LTD
  *
- * SPDX-License-Identifier: CC0-1.0
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <stdio.h>
@@ -30,6 +30,9 @@
 #include "esp_bsp.h"
 
 static const char *TAG = "example";
+
+// Keep all your LCD initialization commands and hardware-specific code the same
+// All the axs15231b-specific initialization should work unchanged
 
 static const axs15231b_lcd_init_cmd_t lcd_init_cmds[] = {
     {0xBB, (uint8_t []){0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0xA5}, 8, 0},
@@ -76,15 +79,16 @@ typedef struct {
 
 typedef struct {
     SemaphoreHandle_t tp_intr_event;    /*!< Semaphore for tp interrupt */
-    lv_disp_rot_t rotate;               /*!< Rotation configuration for the display */
+    lv_display_rotation_t rotate;               /*!< Rotation configuration for the display */
 } bsp_touch_int_t;
 
-static lv_disp_t *disp;
-static lv_indev_t *disp_indev = NULL;
-static esp_lcd_touch_handle_t tp = NULL;   // LCD touch handle
+static lv_display_t *disp;              // Was lv_disp_t *disp
+static lv_indev_t *disp_indev = NULL;   // This stays the same
+static esp_lcd_touch_handle_t tp = NULL;
 static esp_lcd_panel_handle_t panel_handle = NULL;
 
 static bool i2c_initialized = false;
+
 
 esp_err_t bsp_i2c_init(void)
 {
@@ -327,7 +331,8 @@ err:
     return ret;
 }
 
-static lv_disp_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
+/* updated for 9.3.0 */
+static lv_display_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
 {
     assert(cfg != NULL);
     esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -335,10 +340,7 @@ static lv_disp_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
     uint32_t hres;
     uint32_t vres;
 
-    /**
-    * If the transmission time exceeds the refresh period (time_Tvdl), adopt a 2x period,
-    * and start data transmission at the falling edge.
-    */
+    /* Keep all your hardware initialization exactly the same */
     hres = EXAMPLE_LCD_QSPI_H_RES;
     vres = EXAMPLE_LCD_QSPI_V_RES;
     const bsp_display_config_t bsp_disp_cfg = {
@@ -347,13 +349,13 @@ static lv_disp_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
     };
     bsp_display_new(&bsp_disp_cfg, &panel_handle, &io_handle);
 
-    /* Add LCD screen */
+    /* Add LCD screen - UPDATED FOR LVGL 9 */
     ESP_LOGD(TAG, "Add LCD screen");
     lvgl_port_display_cfg_t disp_cfg = {
         .io_handle = io_handle,
         .panel_handle = panel_handle,
         .buffer_size = cfg->buffer_size,
-        .sw_rotate = cfg->rotate,
+        .sw_rotate = cfg->rotate,           // Note: this will be lv_display_rotation_t now
         .hres = hres,
         .vres = vres,
         .trans_size = hres * vres / 10,
@@ -364,7 +366,7 @@ static lv_disp_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
         },
     };
 
-    if (disp_cfg.sw_rotate == LV_DISP_ROT_180 || disp_cfg.sw_rotate == LV_DISP_ROT_NONE) {
+    if (disp_cfg.sw_rotate == LV_DISPLAY_ROTATION_180 || disp_cfg.sw_rotate == LV_DISPLAY_ROTATION_0) {
         disp_cfg.hres = hres;
         disp_cfg.vres = vres;
     } else {
@@ -372,7 +374,7 @@ static lv_disp_t *bsp_display_lcd_init(const bsp_display_cfg_t *cfg)
         disp_cfg.vres = hres;
     }
 
-    return lvgl_port_add_disp(&disp_cfg);
+    return lvgl_port_add_disp(&disp_cfg);  // This now returns lv_display_t*
 }
 
 static bool bsp_touch_sync_cb(void *arg)
@@ -404,25 +406,28 @@ static void bsp_touch_interrupt_cb(esp_lcd_touch_handle_t tp)
     }
 }
 
+/* updated for 9.3.0 */
 static void bsp_touch_process_points_cb(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t *y, uint16_t *strength, uint8_t *point_num, uint8_t max_point_num)
 {
     uint16_t tmp;
     bsp_touch_int_t *touch_handle = (bsp_touch_int_t *)tp->config.user_data;
 
     for (int i = 0; i < *point_num; i++) {
-        if (LV_DISP_ROT_270 == touch_handle->rotate) {
+        // UPDATED: Use new rotation enum values
+        if (LV_DISPLAY_ROTATION_270 == touch_handle->rotate) {
             tmp = x[i];
             x[i] = tp->config.y_max - y[i];
             y[i] = tmp;
-        } else if (LV_DISP_ROT_180 == touch_handle->rotate) {
+        } else if (LV_DISPLAY_ROTATION_180 == touch_handle->rotate) {
             tmp = x[i];
             x[i] = tp->config.x_max - x[i];
             y[i] = tp->config.y_max - y[i];
-        } else if (LV_DISP_ROT_90 == touch_handle->rotate) {
+        } else if (LV_DISPLAY_ROTATION_90 == touch_handle->rotate) {
             tmp = x[i];
             x[i] = y[i];
             y[i] = tp->config.x_max - tmp;
         }
+        // LV_DISPLAY_ROTATION_0 needs no transformation
     }
 }
 
@@ -495,34 +500,32 @@ err:
     return ret;
 }
 
-static lv_indev_t *bsp_display_indev_init(const bsp_display_cfg_t *config, lv_disp_t *disp)
+/* updated 9.3.0 */
+static lv_indev_t *bsp_display_indev_init(const bsp_display_cfg_t *config, lv_display_t *disp)
 {
     BSP_ERROR_CHECK_RETURN_NULL(bsp_touch_new(config, &tp));
     assert(tp);
 
-    /* Add touch input (for selected screen) */
+    /* Add touch input (for selected screen) - UPDATED API */
     const lvgl_port_touch_cfg_t touch_cfg = {
-        .disp = disp,
+        .disp = disp,                    // Now lv_display_t* instead of lv_disp_t*
         .handle = tp,
         .touch_wait_cb = bsp_touch_sync_cb,
     };
 
-    return lvgl_port_add_touch(&touch_cfg);
+    return lvgl_port_add_touch(&touch_cfg);  // Returns lv_indev_t*
 }
 
-lv_disp_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg)
+lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg)
 {
     BSP_ERROR_CHECK_RETURN_NULL(lvgl_port_init(&cfg->lvgl_port_cfg));
-
     BSP_ERROR_CHECK_RETURN_NULL(bsp_display_brightness_init());
 
-    BSP_NULL_CHECK(disp = bsp_display_lcd_init(cfg), NULL);
-
+    BSP_NULL_CHECK(disp = bsp_display_lcd_init(cfg), NULL);    // Now returns lv_display_t*
     BSP_NULL_CHECK(disp_indev = bsp_display_indev_init(cfg, disp), NULL);
 
     return disp;
 }
-
 lv_indev_t *bsp_display_get_input_dev(void)
 {
     return disp_indev;

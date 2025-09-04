@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.9
+ * Configuration file for v9.3.0  // Change from v8.3.9
  */
 
 /*
@@ -11,92 +11,63 @@
  *    - add the path as include path
  */
 
-/* clang-format off */
-#if 1 /*Set it to "1" to enable content*/
+
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
+#endif
 
 #include <stdint.h>
 
 /*====================
    COLOR SETTINGS
  *====================*/
+/*update for 9.3.0*/
 
-/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
-#define LV_COLOR_DEPTH 16
-
-/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
-#define LV_COLOR_16_SWAP 1
-
-/*Enable features to draw on transparent background.
- *It's required if opa, and transform_* style properties are used.
- *Can be also used if the UI is above another layer, e.g. an OSD menu or video player.*/
-#define LV_COLOR_SCREEN_TRANSP 1
-
-/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
- * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
+#define LV_COLOR_FORMAT LV_COLOR_FORMAT_RGB565
+#define LV_COLOR_SCREEN_TRANSPARENCY 1
 #define LV_COLOR_MIX_ROUND_OFS 0
-
-/*Images pixels with this color will not be drawn if they are chroma keyed)*/
-#define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)         /*pure green*/
+#define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)
 
 /*=========================
    MEMORY SETTINGS
  *=========================*/
 
-/*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
-#define LV_MEM_CUSTOM 1
-#if LV_MEM_CUSTOM == 0
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (38ul * 1024U)          /*[bytes]*/
-
-    /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
-    #define LV_MEM_ADR 0     /*0: unused*/
-    /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
-    #if LV_MEM_ADR == 0
-        #undef LV_MEM_POOL_INCLUDE
-        #undef LV_MEM_POOL_ALLOC
-    #endif
-
-#else       /*LV_MEM_CUSTOM*/
-    #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
-    #define LV_MEM_CUSTOM_ALLOC   malloc
-    #define LV_MEM_CUSTOM_FREE    free
-    #define LV_MEM_CUSTOM_REALLOC realloc
-#endif     /*LV_MEM_CUSTOM*/
+/*update for 9.3.0*/
+#define LV_USE_STDLIB_MALLOC 1  // Was LV_MEM_CUSTOM
+#if LV_USE_STDLIB_MALLOC == 0
+    #define LV_MEM_SIZE (38ul * 1024U)
+    #define LV_MEM_ADR 0
+#else
+    #define LV_STDLIB_INCLUDE <stdlib.h>   // Was LV_MEM_CUSTOM_INCLUDE
+    #define LV_MALLOC   malloc              // Was LV_MEM_CUSTOM_ALLOC
+    #define LV_FREE     free                // Was LV_MEM_CUSTOM_FREE
+    #define LV_REALLOC  realloc             // Was LV_MEM_CUSTOM_REALLOC
+#endif
 
 /*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
  *You will see an error log message if there wasn't enough buffers. */
 #define LV_MEM_BUF_MAX_NUM 16
 
 /*Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster).*/
-#define LV_MEMCPY_MEMSET_STD 1
+#define LV_MEMSET_MEMCPY_STDLIB 1  // Was LV_MEMCPY_MEMSET_STD
 
 /*====================
    HAL SETTINGS
  *====================*/
 
-/*Default display refresh period. LVG will redraw changed areas with this period time*/
-#define LV_DISP_DEF_REFR_PERIOD 30      /*[ms]*/
+/*update for 9.3.0*/
+#define LV_DEF_REFR_PERIOD 30           // Was LV_DISP_DEF_REFR_PERIOD
+#define LV_INDEV_DEF_READ_PERIOD 30     // Keep same
+#define LV_USE_OS LV_OS_NONE            // New in v9
 
-/*Input device read period in milliseconds*/
-#define LV_INDEV_DEF_READ_PERIOD 30     /*[ms]*/
-
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #define LV_TICK_CUSTOM 0
 #if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
+    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"
+    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())
+#endif
 
-/*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
- *(Not so important, you can adjust it to modify default sizes and spaces)*/
-#define LV_DPI_DEF 130     /*[px/inch]*/
+#define LV_DPI_DEF 130
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -106,22 +77,26 @@
  * Drawing
  *-----------*/
 
+
+/*update for 9.3.0*/
+#define LV_USE_DRAW_SW 1    
+
 /*Enable complex draw engine.
  *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
 #define LV_DRAW_COMPLEX 1
-#if LV_DRAW_COMPLEX != 0
+
 
     /*Allow buffering some shadow calculation.
     *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
     *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #define LV_SHADOW_CACHE_SIZE 0
+#define LV_SHADOW_CACHE_SIZE 0
 
     /* Set number of maximally cached circle data.
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #define LV_CIRCLE_CACHE_SIZE 4
-#endif /*LV_DRAW_COMPLEX*/
+#define LV_CIRCLE_CACHE_SIZE 4
+
 
 /**
  * "Simple layers" are used when a widget has `style_opa < 255` to buffer the widget into a layer
@@ -228,25 +203,14 @@
 /*-------------
  * Logging
  *-----------*/
-
+/*update for 9.3.0*/
 /*Enable the log module*/
 #define LV_USE_LOG 1
 #if LV_USE_LOG
-
-    /*How important log should be added:
-    *LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
-    *LV_LOG_LEVEL_INFO        Log important events
-    *LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
-    *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
-    *LV_LOG_LEVEL_USER        Only logs added by the user
-    *LV_LOG_LEVEL_NONE        Do not log anything*/
     #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
-
-    /*1: Print the log with 'printf';
-    *0: User need to register a callback with `lv_log_register_print_cb()`*/
     #define LV_LOG_PRINTF 1
-
-    /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
+    
+    /* Keep trace settings: */
     #define LV_LOG_TRACE_MEM        1
     #define LV_LOG_TRACE_TIMER      1
     #define LV_LOG_TRACE_INDEV      1
@@ -255,9 +219,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-
-#endif  /*LV_USE_LOG*/
-
+#endif
 /*-------------
  * Asserts
  *-----------*/
@@ -468,48 +430,9 @@
 /*==================
  *  WIDGET USAGE
  *================*/
-
-/*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
-
-#define LV_USE_ARC        1
-
-#define LV_USE_BAR        1
-
-#define LV_USE_BTN        1
-
-#define LV_USE_BTNMATRIX  1
-
-#define LV_USE_CANVAS     1
-
-#define LV_USE_CHECKBOX   1
-
-#define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
-
-#define LV_USE_IMG        1   /*Requires: lv_label*/
-
-#define LV_USE_LABEL      1
-#if LV_USE_LABEL
-    #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
-    #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
-#endif
-
-#define LV_USE_LINE       1
-
-#define LV_USE_ROLLER     1   /*Requires: lv_label*/
-#if LV_USE_ROLLER
-    #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
-#endif
-
-#define LV_USE_SLIDER     1   /*Requires: lv_bar*/
-
-#define LV_USE_SWITCH     1
-
-#define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
-#if LV_USE_TEXTAREA != 0
-    #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
-#endif
-
-#define LV_USE_TABLE      1
+/* updated for 9.3.0 */
+#define LV_USE_OBJ_PROPERTY_NAME 1      // New object property system
+#define LV_USE_OBJ_ID_BUILTIN 1         // New built-in ID system
 
 /*==================
  * EXTRA COMPONENTS
@@ -518,55 +441,30 @@
 /*-----------
  * Widgets
  *----------*/
-#define LV_USE_ANIMIMG    1
+/* In v9, most widgets are enabled by default */
+/* Only disable what you don't need: */
 
-#define LV_USE_CALENDAR   1
-#if LV_USE_CALENDAR
-    #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
-    #if LV_CALENDAR_WEEK_STARTS_MONDAY
-        #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
-    #else
-        #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
-    #endif
-
-    #define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
-    #define LV_USE_CALENDAR_HEADER_ARROW 1
-    #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
-#endif  /*LV_USE_CALENDAR*/
-
-#define LV_USE_CHART      1
-
-#define LV_USE_COLORWHEEL 1
-
-#define LV_USE_IMGBTN     1
-
+/* Keep these enabled for your use case: */
+#define LV_USE_LABEL      1
+#define LV_USE_BUTTON     1  
+#define LV_USE_IMAGE      1             // Was LV_USE_IMG
+#define LV_USE_SLIDER     1
+#define LV_USE_BAR        1
+#define LV_USE_SWITCH     1
+#define LV_USE_TEXTAREA   1
+#define LV_USE_CANVAS     1
 #define LV_USE_KEYBOARD   1
 
-#define LV_USE_LED        1
-
-#define LV_USE_LIST       1
-
-#define LV_USE_MENU       1
-
-#define LV_USE_METER      1
-
-#define LV_USE_MSGBOX     1
-
-#define LV_USE_SPAN       1
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #define LV_SPAN_SNIPPET_STACK_SIZE 64
+/* Label settings: */
+#if LV_USE_LABEL
+    #define LV_LABEL_TEXT_SELECTION 1
+    #define LV_LABEL_LONG_TXT_HINT 1
 #endif
 
-#define LV_USE_SPINBOX    1
-
-#define LV_USE_SPINNER    1
-
-#define LV_USE_TABVIEW    1
-
-#define LV_USE_TILEVIEW   1
-
-#define LV_USE_WIN        1
+/* Textarea settings: */
+#if LV_USE_TEXTAREA
+    #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500
+#endif
 
 /*-----------
  * Themes
@@ -730,41 +628,3 @@
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
 
-/*===================
- * DEMO USAGE
- ====================*/
-
-/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-#define LV_USE_DEMO_WIDGETS 1
-#if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW 0
-#endif
-
-/*Demonstrate the usage of encoder and keyboard*/
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-
-/*Benchmark your system*/
-#define LV_USE_DEMO_BENCHMARK 1
-#if LV_USE_DEMO_BENCHMARK
-/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-#define LV_DEMO_BENCHMARK_RGB565A8 0
-#endif
-
-/*Stress test for LVGL*/
-#define LV_USE_DEMO_STRESS 1
-
-/*Music player demo*/
-#define LV_USE_DEMO_MUSIC 1
-#if LV_USE_DEMO_MUSIC
-    #define LV_DEMO_MUSIC_SQUARE    0
-    #define LV_DEMO_MUSIC_LANDSCAPE 0
-    #define LV_DEMO_MUSIC_ROUND     0
-    #define LV_DEMO_MUSIC_LARGE     0
-    #define LV_DEMO_MUSIC_AUTO_PLAY 1
-#endif
-
-/*--END OF LV_CONF_H--*/
-
-#endif /*LV_CONF_H*/
-
-#endif /*End of "Content enable"*/
