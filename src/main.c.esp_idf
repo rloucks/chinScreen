@@ -1,0 +1,67 @@
+// main.c - Remove this file from your chinScreen library
+// This file conflicts with Arduino IDE's main sketch
+// The Arduino IDE will use your .ino sketch file instead
+
+// If you need this for ESP-IDF projects, keep it separate
+// but exclude it from the Arduino library compilation
+
+#ifdef ESP_IDF_VERSION
+// Only compile for ESP-IDF, not Arduino IDE
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "lvgl.h"
+#include "chinScreen.h"
+
+static const char *TAG = "LVGL_MAIN";
+
+// LVGL tick task
+static void lv_tick_task(void *arg)
+{
+    (void) arg;
+    while (1) {
+        lv_tick_inc(10); // 10ms tick
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+}
+
+// LVGL handler task
+static void lvgl_handler_task(void *arg)
+{
+    while (1) {
+        uint32_t time_till_next = lv_timer_handler();
+        vTaskDelay(pdMS_TO_TICKS(time_till_next));
+    }
+}
+
+void app_main(void)
+{
+    ESP_LOGI(TAG, "Starting LVGL with chinScreen");
+
+    // Initialize chinScreen display driver
+    esp_err_t ret = chinScreen_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize display");
+        return;
+    }
+
+    // Initialize LVGL
+    lv_init();
+
+    // Initialize display port
+    lv_port_disp_init();
+
+    // Create LVGL tick task
+    xTaskCreate(lv_tick_task, "lv_tick", 2048, NULL, 1, NULL);
+
+    // Create LVGL handler task
+    xTaskCreate(lvgl_handler_task, "lvgl_handler", 4096, NULL, 2, NULL);
+
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+#endif // ESP_IDF_VERSION
