@@ -45,9 +45,9 @@ void example_basic_shapes() {
     lv_obj_t* circle = chinScreen_circle("blue", "yellow", 40, "top", "right");
     chinScreen_shape_text(circle, "Circle", "white", "small");
     
-    lv_obj_t* triangle = chinScreen_triangle("green", "red", 70, 70, "middle", "left");
+   // lv_obj_t* triangle = chinScreen_triangle("green", "red", 70, 70, "middle", "left");
     
-    lv_obj_t* hexagon = chinScreen_hexagon("purple", "white", 35, "middle", "right");
+   // lv_obj_t* hexagon = chinScreen_hexagon("purple", "white", 35, "middle", "right");
     
     lv_obj_t* oval = chinScreen_oval("orange", "blue", 100, 60, "bottom", "center");
     chinScreen_shape_text(oval, "Oval", "black", "medium");

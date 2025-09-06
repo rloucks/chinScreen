@@ -54,10 +54,11 @@ extern "C" {
  *
  */
 typedef struct {
-    lvgl_port_cfg_t lvgl_port_cfg;      /*!< Configuration for the LVGL port */
-    uint32_t buffer_size;               /*!< Size of the buffer for the screen in pixels */
-    lv_display_rotation_t rotate;       /*!< Rotation configuration (was lv_disp_rot_t) */
+    lvgl_port_cfg_t lvgl_port_cfg;  /*!< Configuration for the LVGL port */
+    uint32_t buffer_size;           /*!< Size of the buffer for the screen in pixels */
+    lv_display_rotation_t rotate;           /*!< Rotation configuration for the display */
 } bsp_display_cfg_t;
+
 /**
  * @brief Init I2C driver
  *
@@ -89,7 +90,7 @@ esp_err_t bsp_i2c_deinit(void);
  *
  * @return Pointer to LVGL display or NULL when error occurred
  */
-lv_display_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg);
+lv_disp_t *bsp_display_start_with_config(const bsp_display_cfg_t *cfg);
 
 /**
  * @brief Get pointer to input device (touch, buttons, ...)

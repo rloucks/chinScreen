@@ -13,7 +13,6 @@
 #include "esp_lcd_types.h"
 #include "lvgl.h"
 
-// UPDATED: Touch component detection for LVGL 9
 #if __has_include ("esp_lcd_touch.h")
 #include "esp_lcd_touch.h"
 #define ESP_LVGL_PORT_TOUCH_COMPONENT 1
@@ -39,19 +38,16 @@ typedef struct {
 typedef struct {
     esp_lcd_panel_io_handle_t io_handle;    /*!< LCD panel IO handle */
     esp_lcd_panel_handle_t panel_handle;    /*!< LCD panel handle */
-    lvgl_port_wait_cb draw_wait_cb;         /*!< Callback for drawing synchronization */
+    lvgl_port_wait_cb draw_wait_cb;
 
-    uint32_t    buffer_size;                /*!< Size of the buffer for the screen in pixels */
-    uint32_t    trans_size;                 /*!< Allocated buffer will be in SRAM to move framebuf */
-    uint32_t    hres;                       /*!< LCD display horizontal resolution */
-    uint32_t    vres;                       /*!< LCD display vertical resolution */
-    
-    // MAJOR CHANGE: Updated rotation type
-    lv_display_rotation_t sw_rotate;        /*!< Panel software rotation (was lv_disp_rot_t) */
-    
+    uint32_t    buffer_size;    /*!< Size of the buffer for the screen in pixels */
+    uint32_t    trans_size;     /*!< Allocated buffer will be in SRAM to move framebuf */
+    uint32_t    hres;           /*!< LCD display horizontal resolution */
+    uint32_t    vres;           /*!< LCD display vertical resolution */
+    lv_display_rotation_t   sw_rotate;    /* Panel software rotate_mask */
     struct {
-        unsigned int buff_dma: 1;           /*!< Allocated LVGL buffer will be DMA capable */
-        unsigned int buff_spiram: 1;        /*!< Allocated LVGL buffer will be in PSRAM */
+        unsigned int buff_dma: 1;    /*!< Allocated LVGL buffer will be DMA capable */
+        unsigned int buff_spiram: 1; /*!< Allocated LVGL buffer will be in PSRAM */
     } flags;
 } lvgl_port_display_cfg_t;
 
@@ -60,7 +56,7 @@ typedef struct {
  * @brief Configuration touch structure
  */
 typedef struct {
-    lv_display_t *disp;    /*!< LVGL display handle (returned from lvgl_port_add_disp) */
+    lv_disp_t *disp;    /*!< LVGL display handle (returned from lvgl_port_add_disp) */
     esp_lcd_touch_handle_t   handle;   /*!< LCD touch IO handle */
 
     lvgl_port_wait_cb touch_wait_cb;
@@ -107,59 +103,33 @@ esp_err_t lvgl_port_deinit(void);
 /**
  * @brief Add display handling to LVGL
  *
- * @note Allocated memory in this function is not freed in deinit. 
- * You must call lvgl_port_remove_disp for free all memory!
+ * @note Allocated memory in this function is not free in deinit. You must call lvgl_port_remove_disp for free all memory!
  *
  * @param disp_cfg Display configuration structure
  * @return Pointer to LVGL display or NULL when error occurred
  */
-lv_display_t *lvgl_port_add_disp(const lvgl_port_display_cfg_t *disp_cfg);  // CHANGED: lv_display_t → lv_display_t
+lv_disp_t *lvgl_port_add_disp(const lvgl_port_display_cfg_t *disp_cfg);
 
 /**
  * @brief Remove display handling from LVGL
  *
  * @note Free all memory used for this display.
  *
- * @param disp Pointer to LVGL display
  * @return
  *      - ESP_OK                    on success
  */
-esp_err_t lvgl_port_remove_disp(lv_display_t *disp);  // CHANGED: lv_display_t → lv_display_t
-
-#ifdef ESP_LVGL_PORT_TOUCH_COMPONENT
-/**
- * @brief Touch configuration structure
- */
-//typedef struct {
-//    lv_display_t *disp;                     /*!< LVGL display handle (was lv_display_t) */
-//    esp_lcd_touch_handle_t handle;          /*!< LCD touch IO handle */
-//    lvgl_port_wait_cb touch_wait_cb;        /*!< Callback for touch synchronization */
-//} lvgl_port_touch_cfg_t;
-#endif
+esp_err_t lvgl_port_remove_disp(lv_disp_t *disp);
 
 #ifdef ESP_LVGL_PORT_TOUCH_COMPONENT
 /**
  * @brief Add LCD touch as an input device
  *
- * @note Allocated memory in this function is not freed in deinit. 
- * You must call lvgl_port_remove_touch for free all memory!
+ * @note Allocated memory in this function is not free in deinit. You must call lvgl_port_remove_touch for free all memory!
  *
  * @param touch_cfg Touch configuration structure
  * @return Pointer to LVGL touch input device or NULL when error occurred
  */
-lv_indev_t *lvgl_port_add_touch(const lvgl_port_touch_cfg_t *touch_cfg);  // Return type stays same
-
-/**
- * @brief Remove selected LCD touch from input devices
- *
- * @note Free all memory used for this touch device.
- *
- * @param touch Pointer to LVGL input device
- * @return
- *      - ESP_OK                    on success
- */
-esp_err_t lvgl_port_remove_touch(lv_indev_t *touch);  // Parameter type stays same
-#endif
+lv_indev_t *lvgl_port_add_touch(const lvgl_port_touch_cfg_t *touch_cfg);
 
 /**
  * @brief Remove selected LCD touch from input devices
@@ -170,7 +140,7 @@ esp_err_t lvgl_port_remove_touch(lv_indev_t *touch);  // Parameter type stays sa
  *      - ESP_OK                    on success
  */
 esp_err_t lvgl_port_remove_touch(lv_indev_t *touch);
-
+#endif
 
 /**
  * @brief Take LVGL mutex
