@@ -82,7 +82,7 @@ static void lvgl_port_task_deinit(void);
 #if LVGL_PORT_HANDLE_FLUSH_READY
 static bool lvgl_port_flush_ready_callback(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
 #endif
-static void lvgl_port_flush_callback(lv_display_t *disp, const lv_area_t *area, lv_color_t *color_map);
+static void lvgl_port_flush_callback(lv_display_t *disp, const lv_area_t *area, uint8_t *color_map);
 #ifdef ESP_LVGL_PORT_TOUCH_COMPONENT
 static void lvgl_port_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data);
 #endif
@@ -385,7 +385,7 @@ static void lvgl_port_flush_callback(lv_display_t *drv, const lv_area_t *area, u
     const int width = x_end - x_start + 1;
     const int height = y_end - y_start + 1;
 
-lv_color_t *from = color_map;  // Remove the cast
+lv_color_t *from = (lv_color_t *)color_map;
 lv_color_t *to = NULL;
 
     if (disp_ctx->trans_size) {
