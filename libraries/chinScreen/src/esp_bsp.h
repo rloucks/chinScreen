@@ -15,7 +15,7 @@
 #include "sdkconfig.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
-#include "lvgl.h"
+#include "includes/lvgl-8.3.11/src/lvgl.h"
 #include "lv_port.h"
 
 /**************************************************************************************************

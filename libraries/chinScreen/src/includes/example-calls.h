@@ -1,0 +1,10 @@
+/////////////////////////////////////////////////////////////
+// Example button callback function
+/////////////////////////////////////////////////////////////
+inline void example_button_callback(lv_event_t* e) {
+    Serial.println("Button clicked!");
+    // Add your button action here
+}
+
+
+

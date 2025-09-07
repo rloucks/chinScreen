@@ -17,7 +17,7 @@
 #include "esp_lcd_panel_interface.h"
 
 #include "lv_port.h"
-#include "lvgl.h"
+#include "includes/lvgl-8.3.11/src/lvgl.h"
 
 #ifdef ESP_LVGL_PORT_TOUCH_COMPONENT
 #include "esp_lcd_touch.h"

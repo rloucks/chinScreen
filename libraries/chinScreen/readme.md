@@ -1,11 +1,35 @@
-<img width="289" height="116" alt="image" src="https://github.com/user-attachments/assets/502aafaf-2ab0-443a-b9e0-9ddc04817f13" />
+<img width="530" height="116" alt="image" src="https://github.com/user-attachments/assets/464fcc3b-f911-49a7-acf1-0e1cd95a92b2" />
 
-**Robust library for the JC3248W525EN using lvgl because it works**
+**Stupid library for the JC3248W525EN using lvgl because it works**
 
 > [!NOTE]
 > Remember to use the following header to set the orientation:\
 > #define LVGL_PORT_ROTATION_DEGREE 0\
 > #include <chinScreen.h>
+
+## Table of Contents
+
+- [Installation](#installation)  
+- [Initialization](#initialization)  
+- [Display Controls](#display-controls)  
+- [Backgrounds](#backgrounds)  
+- [Text Functions](#text-functions)  
+- [Shapes](#shapes)  
+  - [Rectangle](#rectangle)  
+  - [Circle](#circle)  
+  - [Triangle](#triangle)  
+  - [Hexagon](#hexagon)  
+  - [Oval](#oval)  
+- [Shape Text](#shape-text)  
+- [Buttons](#buttons)  
+- [Sliders](#sliders)  
+- [Toggle Switches](#toggle-switches)  
+- [Animations](#animations)  
+- [Progress Bar](#progress-bar)  
+- [Utilities](#utilities)  
+- [Example UI](#example-ui)
+
+---
 
 ## Initialization
 ```
@@ -23,11 +47,6 @@ chinScreen_backlight(0); // Off
 Set Brightness
 ```
 chinScreen_brightness(128); // Range 0-255
-```
-
-Initializes SD Card
-```
-chinScreen_init_sd_card();
 ```
 
 ---

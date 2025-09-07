@@ -1,49 +1,45 @@
-// chinScreen Bouncing Ball Example
-// Super simple animated ball that bounces around the screen
-
+//=============================================================================
+// EXAMPLE 6: Temperature Monitor with Animations
+//=============================================================================
 #include "chinScreen.h"
 
-lv_obj_t* ball;
-int ballX = 50, ballY = 50;
-int speedX = 3, speedY = 2;
-int screenWidth = 320, screenHeight = 240; // Adjust for your screen
-int ballSize = 30;
+lv_obj_t* temp_circle;
+lv_obj_t* temp_bar;
 
 void setup() {
     Serial.begin(115200);
     init_display();
+    //chinScreen_init_sd_card(5);
     
-    // Dark background with gradient
-    chinScreen_background_gradient("navy", "purple", "vertical");
+    // Cool gradient background
+    chinScreen_background_gradient("black", "purple", "vertical");
     
-    // Create the bouncing ball
-    ball = chinScreen_circle("orange", "yellow", ballSize, "top", "left");
-    chinScreen_set_position(ball, ballX, ballY);
+    // Title
+    chinScreen_text("Temperature", 10, 10, "white", "large");
     
-    // Add some sparkle with small decorative shapes
-    chinScreen_circle("yellow", "white", 8, "top", "right");
-    chinScreen_circle("cyan", "white", 6, "bottom", "left");
-    chinScreen_circle("pink", "white", 10, "top", "left");
+    // Temperature display circle
+    temp_circle = chinScreen_circle("red", "white", 60, "top", "right");
+    chinScreen_shape_text(temp_circle, "75°F", "white", "large");
     
-    Serial.println("Bouncing ball started!");
+    // Progress bar for temperature
+    temp_bar = chinScreen_progress_bar(200, 20, 75, "gray", "orange", "middle", "center");
+    
+    // Animate the circle (pulsing effect)
+    chinScreen_animate_advanced(temp_circle, ANIM_SCALE, 120, 140, 2000, true, "ease_in_out");
+    
+    // Control buttons
+    chinScreen_button("green", "yellow", 100, 40, "Refresh", update_temp, "bottom", "center");
 }
 
 void loop() {
-    // Update ball position
-    ballX += speedX;
-    ballY += speedY;
+    delay(10);
+}
+
+void update_temp(lv_event_t* e) {
+    // Simulate temperature reading
+    int new_temp = random(60, 90);
+    chinScreen_progress_set_value(temp_bar, new_temp);
     
-    // Bounce off walls
-    if (ballX <= 0 || ballX >= screenWidth - ballSize*2) {
-        speedX = -speedX;
-    }
-    if (ballY <= 0 || ballY >= screenHeight - ballSize*2) {
-        speedY = -speedY;
-    }
-    
-    // Move the ball
-    chinScreen_set_position(ball, ballX, ballY);
-    
-    // Small delay for smooth animation
-    delay(16); // ~60 FPS
+    // Update circle text (in real code, you'd update the label)
+    Serial.printf("Temperature updated to %d°F\n", new_temp);
 }
