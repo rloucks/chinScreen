@@ -1,18 +1,100 @@
 
+// Add PNG support function
+inline lv_obj_t* chinScreen_png(const unsigned char* png_data, uint32_t png_size,
+                               const char* vAlign = "middle", 
+                               const char* hAlign = "center") {
+    bsp_display_lock(0);
+
+    // Create image descriptor for PNG
+    static lv_img_dsc_t png_dsc;
+    memset(&png_dsc, 0, sizeof(lv_img_dsc_t));
+    png_dsc.header.cf = LV_IMG_CF_RAW;
+    png_dsc.data = png_data;
+    png_dsc.data_size = png_size;
+
+    lv_obj_t *img = lv_img_create(lv_scr_act());
+    if (img) {
+        lv_img_set_src(img, &png_dsc);
+        
+        // Handle alignment (same as before)
+        lv_align_t align = LV_ALIGN_CENTER;
+        if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_TOP_LEFT;
+        // ... etc (same alignment code as your GIF function)
+        
+        lv_obj_align(img, align, 0, 0);
+    }
+
+    bsp_display_unlock();
+    return img;
+}
+
+
+lv_obj_t* chinScreen_gif(const unsigned char* gif_data, uint32_t gif_size) {
+    bsp_display_lock(0);
+
+    // Initialize structure to zero first
+    static lv_img_dsc_t gif_dsc;
+    memset(&gif_dsc, 0, sizeof(lv_img_dsc_t));
+    
+    // Set the fields we need
+    gif_dsc.data = gif_data;
+    gif_dsc.data_size = gif_size;
+
+    lv_obj_t *img = lv_gif_create(lv_scr_act());
+    if (img) {
+        lv_gif_set_src(img, &gif_dsc);
+        lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+    }
+
+    bsp_display_unlock();
+    return img;
+}
+
+void chinScreen_gif_zoom(lv_obj_t* gif_obj, float zoom_factor) {
+    if (!gif_obj) return;
+    
+    bsp_display_lock(0);
+    
+    // Convert zoom factor to LVGL's scale format (256 = 100%)
+    int16_t zoom_lvgl = (int16_t)(zoom_factor * 256);
+    
+    lv_obj_set_style_transform_zoom(gif_obj, zoom_lvgl, LV_PART_MAIN);
+    
+    bsp_display_unlock();
+}
+
+// Usage examples:
+// chinScreen_gif_zoom(myGif, 0.5f);   // 50% size (shrink)
+// chinScreen_gif_zoom(myGif, 1.0f);   // 100% size (normal)
+// chinScreen_gif_zoom(myGif, 2.0f);   // 200% size (grow)
+// chinScreen_gif_zoom(myGif, 1.5f);   // 150% size
+
+// Smoothly animate zoom changes
+void chinScreen_gif_animate_zoom(lv_obj_t* gif_obj, float from_zoom, float to_zoom, 
+                                 uint32_t duration_ms = 500) {
+    if (!gif_obj) return;
+    
+    bsp_display_lock(0);
+    
+    lv_anim_t anim;
+    lv_anim_init(&anim);
+    lv_anim_set_var(&anim, gif_obj);
+    lv_anim_set_time(&anim, duration_ms);
+    lv_anim_set_values(&anim, (int32_t)(from_zoom * 256), (int32_t)(to_zoom * 256));
+    lv_anim_set_exec_cb(&anim, (lv_anim_exec_xcb_t)lv_obj_set_style_transform_zoom);
+    lv_anim_set_path_cb(&anim, lv_anim_path_ease_in_out);
+    lv_anim_start(&anim);
+    
+    bsp_display_unlock();
+}
+
+// Usage:
+// chinScreen_gif_animate_zoom(myGif, 1.0f, 2.0f, 1000); // Grow over 1 second
+// chinScreen_gif_animate_zoom(myGif, 2.0f, 0.5f, 500);  // Shrink over 0.5 seconds
 
 
 /////////////////////////////////////////////////////////////
 // Image/GIF display function
-// - Supports embedded lv_img_dsc_t (PNG/BMP/etc.)
-// - Supports embedded raw GIF arrays (uint8_t[])
-/////////////////////////////////////////////////////////////
-// Static PNG/BMP (converted with LVGL image converter):
-// extern const lv_img_dsc_t my_logo;   // from converter .c/.h
-// chinScreen_image(&my_logo, false);   // false → not a GIF
-//
-// Animated GIF (embedded as raw byte array):
-// extern const uint8_t clogo_gif[];   // raw GIF data
-// chinScreen_image(clogo_gif, true);  // true → it's a GIF
 
 
 inline lv_obj_t* chinScreen_image(const void* src,
