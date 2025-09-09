@@ -44,42 +44,41 @@
 
 // these can be added or removed
 #ifdef CHINSCREEN_ENABLE_SHAPES
-#include "includes/shapes.h"
+#include "includes/shapes.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_MEDIA
-#include "includes/media.h"
+#include "includes/media.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_ICONS
-#include "includes/icons.h"
+#include "includes/icons.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_ANIMATED_ICONS
-#include "includes/animated_icons.h"
+#include "includes/animated_icons.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_ANIMATIONS
-#include "includes/animations.h"
-#endif
-
-#ifdef CHINSCREEN_ENABLE_SPRITES
-#include "includes/sprites.h"
-#endif
-
-#ifdef CHINSCREEN_ENABLE_GFONTS
-#include "includes/google_fonts.h"
+#include "includes/animations.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_EXAMPLES
-#include "includes/example-calls.h"
+#include "includes/example-calls.inc"
 #endif
 
 #ifdef CHINSCREEN_ENABLE_DEBUG
-#include "includes/debug.h"
+#include "includes/debug.inc"
 #endif
-
 
 /////////////////////////////////////////////////////////////
 // New Untested Items
 /////////////////////////////////////////////////////////////
+
+#ifdef CHINSCREEN_ENABLE_GFONTS
+#include "includes/google_fonts.inc"
+#endif
+
+#ifdef CHINSCREEN_ENABLE_SPRITES
+#include "includes/sprites.inc"
+#endif
