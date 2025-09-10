@@ -1,6 +1,7 @@
 # chinScreen Library v0.0.2b
 
-<img width="530" height="116" alt="image" src="https://github.com/user-attachments/assets/464fcc3b-f911-49a7-acf1-0e1cd95a92b2" />
+<img width="289" height="116" alt="image" src="https://github.com/user-attachments/assets/ac291586-abfd-420b-b469-9a0d837e4e67" />
+
 
 **Enhanced library for the JC3248W525EN using LVGL with comprehensive features**
 
