@@ -1,3 +1,25 @@
+//         __     __         _______                              
+//  .----.|  |--.|__|.-----.|     __|.----.----.-----.-----.-----.
+//  |  __||     ||  ||     ||__     ||  __|   _|  -__|  -__|     |
+//  |____||__|__||__||__|__||_______||____|__| |_____|_____|__|__|
+//
+//   Improved library for the JC3248W525EN using LVGL based on 
+//   too many attempts on the internet. This should be easy to useful
+// 
+//   Author: Richard Loucks
+//   Inital Release: Sept 2025
+//   For updates, see git commits
+//   https://github.com/rloucks/chinScreen
+//
+//   Version: 0.0.2b
+//
+//   Hardware based for JC3248W525EN touch screen ESP32-S3 Panel
+//
+//   File: basic.h
+//   Purpose: library and calls for animated gifs
+//   Required: NO
+
+
 // icons.h - Icon management for chinScreen library
 // animated_icons.h - Fixed version
 #pragma once

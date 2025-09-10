@@ -1,3 +1,24 @@
+//         __     __         _______                              
+//  .----.|  |--.|__|.-----.|     __|.----.----.-----.-----.-----.
+//  |  __||     ||  ||     ||__     ||  __|   _|  -__|  -__|     |
+//  |____||__|__||__||__|__||_______||____|__| |_____|_____|__|__|
+//
+//   Improved library for the JC3248W525EN using LVGL based on 
+//   too many attempts on the internet. This should be easy to useful
+// 
+//   Author: Richard Loucks
+//   Inital Release: Sept 2025
+//   For updates, see git commits
+//   https://github.com/rloucks/chinScreen
+//
+//   Version: 0.0.2b
+//
+//   Hardware based for JC3248W525EN touch screen ESP32-S3 Panel
+//
+//   File: colors.h
+//   Purpose: colors!
+//   Required: YES
+
 /////////////////////////////////////////////////////////////
 // Complete set of 140 HTML color names and values for LVGL 8.3.11
 /////////////////////////////////////////////////////////////
@@ -218,7 +239,7 @@ inline const char* getColorNameByIndex(uint8_t index) {
 }
 
 /////////////////////////////////////////////////////////////
-// Function: Set gradient background
+// Function: Set gradient background (original 2-color)
 /////////////////////////////////////////////////////////////
 inline void chinScreen_background_gradient(const char* color1Name, const char* color2Name, 
                                           const char* direction = "vertical") {
@@ -237,4 +258,308 @@ inline void chinScreen_background_gradient(const char* color1Name, const char* c
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
     
     bsp_display_unlock();
+}
+
+/////////////////////////////////////////////////////////////
+// Enhanced Gradient System - Multi-Color Support
+/////////////////////////////////////////////////////////////
+
+// Gradient stop structure for multi-color gradients
+struct chinScreen_gradient_stop {
+    lv_color_t color;
+    uint8_t position;  // 0-100 percentage position
+};
+
+// Pre-defined rainbow color arrays
+static const lv_color_t rainbow_colors[] = {
+    lv_color_make(255, 0, 0),    // Red
+    lv_color_make(255, 127, 0),  // Orange
+    lv_color_make(255, 255, 0),  // Yellow
+    lv_color_make(0, 255, 0),    // Green
+    lv_color_make(0, 0, 255),    // Blue
+    lv_color_make(75, 0, 130),   // Indigo
+    lv_color_make(148, 0, 211)   // Violet
+};
+
+// Sunset gradient colors
+static const lv_color_t sunset_colors[] = {
+    lv_color_make(255, 94, 77),   // Coral
+    lv_color_make(255, 154, 0),   // Orange
+    lv_color_make(255, 206, 84),  // Yellow
+    lv_color_make(255, 138, 101), // Peach
+    lv_color_make(161, 102, 171)  // Purple
+};
+
+// Ocean gradient colors
+static const lv_color_t ocean_colors[] = {
+    lv_color_make(0, 119, 190),   // Deep blue
+    lv_color_make(0, 180, 216),   // Sky blue
+    lv_color_make(144, 224, 239), // Light blue
+    lv_color_make(202, 240, 248)  // Very light blue
+};
+
+// Fire gradient colors
+static const lv_color_t fire_colors[] = {
+    lv_color_make(139, 0, 0),     // Dark red
+    lv_color_make(255, 0, 0),     // Red
+    lv_color_make(255, 165, 0),   // Orange
+    lv_color_make(255, 255, 0),   // Yellow
+    lv_color_make(255, 255, 255)  // White
+};
+
+/////////////////////////////////////////////////////////////
+// Function: Create multi-color gradient background
+/////////////////////////////////////////////////////////////
+inline void chinScreen_background_multi_gradient(const chinScreen_gradient_stop* stops, 
+                                                 uint8_t stop_count,
+                                                 const char* direction = "vertical") {
+    if (stop_count < 2) return;
+    
+    bsp_display_lock(0);
+    lv_obj_t *scr = lv_scr_act();
+    
+    // Clear any existing children first
+    lv_obj_clean(scr);
+    
+    // CRITICAL: Ensure the screen itself has no padding/margins
+    lv_obj_set_style_pad_all(scr, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(scr, 0, LV_PART_MAIN);
+    
+    lv_grad_dir_t grad_dir = LV_GRAD_DIR_VER;
+    if (strcmp(direction, "horizontal") == 0) grad_dir = LV_GRAD_DIR_HOR;
+    
+    // Use the full display resolution constants
+    lv_coord_t screen_width = LV_HOR_RES;
+    lv_coord_t screen_height = LV_VER_RES;
+    
+    // Set screen background to the first color as fallback
+    lv_obj_set_style_bg_color(scr, stops[0].color, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create gradient segments with guaranteed full coverage
+    for (uint8_t i = 0; i < stop_count - 1; i++) {
+        lv_obj_t *gradient_obj = lv_obj_create(scr);
+        
+        // CRITICAL: Remove ALL styling that could create gaps
+        lv_obj_remove_style_all(gradient_obj);
+        lv_obj_set_style_border_width(gradient_obj, 0, LV_PART_MAIN);
+        lv_obj_set_style_pad_all(gradient_obj, 0, LV_PART_MAIN);
+        lv_obj_set_style_outline_width(gradient_obj, 0, LV_PART_MAIN);
+        lv_obj_clear_flag(gradient_obj, LV_OBJ_FLAG_SCROLLABLE);
+        
+        // Calculate segment positions with overlap
+        uint8_t start_pos = stops[i].position;
+        uint8_t end_pos = stops[i + 1].position;
+        
+        lv_coord_t start_pixel, size_pixel;
+        
+        if (grad_dir == LV_GRAD_DIR_VER) {
+            // Vertical gradient - calculate precise boundaries
+            start_pixel = (start_pos * screen_height) / 100;
+            lv_coord_t end_pixel = (end_pos * screen_height) / 100;
+            size_pixel = end_pixel - start_pixel;
+            
+            // Add minimal overlap to prevent gaps but avoid scroll
+            if (i > 0) start_pixel -= 1;  // Minimal overlap with previous
+            if (i < stop_count - 2) {
+                size_pixel += 2;  // Small overlap with next
+            } else {
+                // Last segment - ensure it ends exactly at screen bottom
+                size_pixel = screen_height - start_pixel;
+            }
+            
+            // Ensure we don't go negative or exceed screen bounds
+            if (start_pixel < 0) start_pixel = 0;
+            if (start_pixel + size_pixel > screen_height) {
+                size_pixel = screen_height - start_pixel;
+            }
+            
+            lv_obj_set_size(gradient_obj, screen_width, size_pixel);
+            lv_obj_set_pos(gradient_obj, 0, start_pixel);
+            
+        } else {
+            // Horizontal gradient - calculate precise boundaries
+            start_pixel = (start_pos * screen_width) / 100;
+            lv_coord_t end_pixel = (end_pos * screen_width) / 100;
+            size_pixel = end_pixel - start_pixel;
+            
+            // Add minimal overlap to prevent gaps but avoid scroll
+            if (i > 0) start_pixel -= 1;  // Minimal overlap with previous
+            if (i < stop_count - 2) {
+                size_pixel += 2;  // Small overlap with next
+            } else {
+                // Last segment - ensure it ends exactly at screen edge
+                size_pixel = screen_width - start_pixel;
+            }
+            
+            // Ensure we don't go negative or exceed screen bounds
+            if (start_pixel < 0) start_pixel = 0;
+            if (start_pixel + size_pixel > screen_width) {
+                size_pixel = screen_width - start_pixel;
+            }
+            
+            lv_obj_set_size(gradient_obj, size_pixel, screen_height);
+            lv_obj_set_pos(gradient_obj, start_pixel, 0);
+        }
+        
+        // Set gradient colors
+        lv_obj_set_style_bg_color(gradient_obj, stops[i].color, LV_PART_MAIN);
+        lv_obj_set_style_bg_grad_color(gradient_obj, stops[i + 1].color, LV_PART_MAIN);
+        lv_obj_set_style_bg_grad_dir(gradient_obj, grad_dir, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(gradient_obj, LV_OPA_COVER, LV_PART_MAIN);
+        
+        // Ensure the object is positioned correctly
+        lv_obj_move_background(gradient_obj);
+    }
+    
+    bsp_display_unlock();
+}
+
+/////////////////////////////////////////////////////////////
+// Function: Create rainbow gradient background
+/////////////////////////////////////////////////////////////
+inline void chinScreen_background_rainbow(const char* direction = "vertical", 
+                                          const char* style = "full") {
+    chinScreen_gradient_stop stops[7];
+    
+    // Create rainbow stops with equal spacing
+    for (int i = 0; i < 7; i++) {
+        stops[i].color = rainbow_colors[i];
+        stops[i].position = (i * 100) / 6;  // 0, 16, 33, 50, 66, 83, 100
+    }
+    
+    // Adjust for different rainbow styles
+    if (strcmp(style, "warm") == 0) {
+        // Only red, orange, yellow
+        chinScreen_gradient_stop warm_stops[3] = {
+            {rainbow_colors[0], 0},   // Red
+            {rainbow_colors[1], 50},  // Orange
+            {rainbow_colors[2], 100}  // Yellow
+        };
+        chinScreen_background_multi_gradient(warm_stops, 3, direction);
+    } else if (strcmp(style, "cool") == 0) {
+        // Only green, blue, indigo, violet
+        chinScreen_gradient_stop cool_stops[4] = {
+            {rainbow_colors[3], 0},   // Green
+            {rainbow_colors[4], 33},  // Blue
+            {rainbow_colors[5], 66},  // Indigo
+            {rainbow_colors[6], 100}  // Violet
+        };
+        chinScreen_background_multi_gradient(cool_stops, 4, direction);
+    } else {
+        // Full rainbow
+        chinScreen_background_multi_gradient(stops, 7, direction);
+    }
+}
+
+/////////////////////////////////////////////////////////////
+// Function: Create preset gradient backgrounds
+/////////////////////////////////////////////////////////////
+inline void chinScreen_background_preset_gradient(const char* preset_name, 
+                                                  const char* direction = "vertical") {
+    if (strcmp(preset_name, "sunset") == 0) {
+        chinScreen_gradient_stop stops[5];
+        for (int i = 0; i < 5; i++) {
+            stops[i].color = sunset_colors[i];
+            stops[i].position = (i * 100) / 4;
+        }
+        chinScreen_background_multi_gradient(stops, 5, direction);
+        
+    } else if (strcmp(preset_name, "ocean") == 0) {
+        chinScreen_gradient_stop stops[4];
+        for (int i = 0; i < 4; i++) {
+            stops[i].color = ocean_colors[i];
+            stops[i].position = (i * 100) / 3;
+        }
+        chinScreen_background_multi_gradient(stops, 4, direction);
+        
+    } else if (strcmp(preset_name, "fire") == 0) {
+        chinScreen_gradient_stop stops[5];
+        for (int i = 0; i < 5; i++) {
+            stops[i].color = fire_colors[i];
+            stops[i].position = (i * 100) / 4;
+        }
+        chinScreen_background_multi_gradient(stops, 5, direction);
+        
+    } else if (strcmp(preset_name, "rainbow") == 0) {
+        chinScreen_background_rainbow(direction, "full");
+        
+    } else {
+        Serial.println("Unknown preset gradient name");
+    }
+}
+
+/////////////////////////////////////////////////////////////
+// Function: Create custom gradient from color names
+/////////////////////////////////////////////////////////////
+inline void chinScreen_background_custom_gradient(const char* color_names[], 
+                                                  uint8_t color_count,
+                                                  const char* direction = "vertical") {
+    if (color_count < 2) return;
+    
+    chinScreen_gradient_stop* stops = new chinScreen_gradient_stop[color_count];
+    
+    for (uint8_t i = 0; i < color_count; i++) {
+        stops[i].color = getColorByName(color_names[i]);
+        stops[i].position = (i * 100) / (color_count - 1);
+    }
+    
+    chinScreen_background_multi_gradient(stops, color_count, direction);
+    delete[] stops;
+}
+
+/////////////////////////////////////////////////////////////
+// Function: Create gradient with custom positions
+/////////////////////////////////////////////////////////////
+inline void chinScreen_background_positioned_gradient(const char* color_names[], 
+                                                      uint8_t positions[],
+                                                      uint8_t color_count,
+                                                      const char* direction = "vertical") {
+    if (color_count < 2) return;
+    
+    chinScreen_gradient_stop* stops = new chinScreen_gradient_stop[color_count];
+    
+    for (uint8_t i = 0; i < color_count; i++) {
+        stops[i].color = getColorByName(color_names[i]);
+        stops[i].position = positions[i];
+    }
+    
+    chinScreen_background_multi_gradient(stops, color_count, direction);
+    delete[] stops;
+}
+
+/////////////////////////////////////////////////////////////
+// Debug function to check screen dimensions
+/////////////////////////////////////////////////////////////
+inline void chinScreen_debug_screen_info() {
+    bsp_display_lock(0);
+    lv_obj_t *scr = lv_scr_act();
+    
+    Serial.printf("Screen dimensions: %d x %d\n", lv_obj_get_width(scr), lv_obj_get_height(scr));
+    Serial.printf("LV_HOR_RES: %d, LV_VER_RES: %d\n", LV_HOR_RES, LV_VER_RES);
+    Serial.printf("Screen padding: top=%d, bottom=%d, left=%d, right=%d\n", 
+                  lv_obj_get_style_pad_top(scr, LV_PART_MAIN),
+                  lv_obj_get_style_pad_bottom(scr, LV_PART_MAIN),
+                  lv_obj_get_style_pad_left(scr, LV_PART_MAIN),
+                  lv_obj_get_style_pad_right(scr, LV_PART_MAIN));
+    
+    bsp_display_unlock();
+}
+
+/////////////////////////////////////////////////////////////
+// Initialize screen to ensure no padding/borders
+/////////////////////////////////////////////////////////////
+inline void chinScreen_init_screen_for_gradients() {
+    bsp_display_lock(0);
+    lv_obj_t *scr = lv_scr_act();
+    
+    // Remove any existing styling that might cause gaps
+    lv_obj_set_style_pad_all(scr, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(scr, 0, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(scr, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+    
+    bsp_display_unlock();
+    
+    Serial.println("Screen initialized for full-coverage gradients");
 }

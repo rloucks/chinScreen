@@ -1,3 +1,24 @@
+//         __     __         _______                              
+//  .----.|  |--.|__|.-----.|     __|.----.----.-----.-----.-----.
+//  |  __||     ||  ||     ||__     ||  __|   _|  -__|  -__|     |
+//  |____||__|__||__||__|__||_______||____|__| |_____|_____|__|__|
+//
+//   Improved library for the JC3248W525EN using LVGL based on 
+//   too many attempts on the internet. This should be easy to useful
+// 
+//   Author: Richard Loucks
+//   Inital Release: Sept 2025
+//   For updates, see git commits
+//   https://github.com/rloucks/chinScreen
+//
+//   Version: 0.0.2b
+//
+//   Hardware based for JC3248W525EN touch screen ESP32-S3 Panel
+//
+//   File: media.h
+//   Purpose: image and movie functions
+//   Required: NO
+
 
 // Add PNG support function
 inline lv_obj_t* chinScreen_png(const unsigned char* png_data, uint32_t png_size,
