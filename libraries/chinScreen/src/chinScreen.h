@@ -63,6 +63,15 @@
 #include "includes/animations.inc"
 #endif
 
+#ifdef CHINSCREEN_ENABLE_ANIMATED_BACKGROUNDS
+#include "includes/animated_backgrounds.inc"
+#endif
+
+#ifdef CHINSCREEN_ENABLE_ANIMATED_OBJECTS 
+//for objects overlay when using animated backgrounds
+#include "includes/animation_objects.inc"
+#endif
+
 #ifdef CHINSCREEN_ENABLE_EXAMPLES
 #include "includes/example-calls.inc"
 #endif
