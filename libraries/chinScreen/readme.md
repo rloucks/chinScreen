@@ -120,7 +120,7 @@ chinScreen_background_preset_gradient("fire", "vertical");
 ---
 
 ## Text Functions
-
+Note: if you use "center" on an object, the x/y will move from that starting point as an example
 ```cpp
 chinScreen_text("Hello World", 50, 50, "yellow", "large");
 ```
