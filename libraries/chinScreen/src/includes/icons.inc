@@ -183,6 +183,40 @@ extern const unsigned char search_png[];
 extern const unsigned int search_png_len;
 #endif
 
+#ifdef CHINSCREEN_ICON_DOORBELL
+#include "includes/icons/png/package.inc"
+extern const unsigned char package_png[];
+extern const unsigned int package_png_len;
+#include "includes/icons/png/visitor.inc"
+extern const unsigned char visitor_png[];
+extern const unsigned int visitor_png_len;
+#include "includes/icons/png/anvil.inc"
+extern const unsigned char anvil_png[];
+extern const unsigned int anvil_png_len;
+#include "includes/icons/png/food.inc"
+extern const unsigned char food_png[];
+extern const unsigned int food_png_len;
+#include "includes/icons/png/other.inc"
+extern const unsigned char other_png[];
+extern const unsigned int other_png_len;
+#include "includes/icons/png/mail.inc"
+extern const unsigned char mail_png[];
+extern const unsigned int mail_png_len;
+#include "includes/icons/png/filled.inc"
+extern const unsigned char filled_png[];
+extern const unsigned int filled_png_len;
+#include "includes/icons/png/empty.inc"
+extern const unsigned char empty_png[];
+extern const unsigned int empty_png_len;
+#endif
+
+#ifdef CHINSCREEN_ICON_CYOA
+#include "includes/icons/png/cyoa.inc"
+extern const unsigned char cyoa_png[];
+extern const unsigned int cyoa_png_len;
+#endif
+
+
 // Enhanced icon definitions structure
 typedef struct {
     const char* name;
@@ -285,6 +319,22 @@ static const chinScreen_icon_t chinScreen_icons[] = {
 #ifdef CHINSCREEN_ICON_SEARCH
     {"search", search_png, &search_png_len, true},
 #endif
+
+#ifdef CHINSCREEN_ICON_DOORBELL
+    {"package", package_png, &package_png_len, true},
+	{"visitor", visitor_png, &visitor_png_len, true},
+	{"anvil", anvil_png, &anvil_png_len, true},
+	{"mail", mail_png, &mail_png_len, true},
+	{"food", food_png, &food_png_len, true},
+	{"other", other_png, &other_png_len, true},
+	{"filled", filled_png, &filled_png_len, true},
+	{"empty", empty_png, &empty_png_len, true},
+#endif
+
+#ifdef CHINSCREEN_ICON_CYOA
+    {"cyoa", cyoa_png, &cyoa_png_len, true},
+#endif
+
 };
 
 static const int chinScreen_icon_count = sizeof(chinScreen_icons) / sizeof(chinScreen_icons[0]);
@@ -580,4 +630,53 @@ inline lv_obj_t* chinScreen_icon_grid(const char* icon_name,
     int pixel_y = start_y + (grid_y * spacing_y);
     
     return chinScreen_icon_at(icon_name, pixel_x, pixel_y, zoom, color);
+}
+
+inline lv_obj_t* chinScreen_icon_xy(const char* icon_name, 
+                                    int x, int y,
+                                    float zoom = 1.0f,
+                                    const char* color = nullptr) {
+    // Find the icon
+    const chinScreen_icon_t* icon = chinScreen_find_icon(icon_name);
+    if (!icon) {
+        Serial.printf("Error: Icon '%s' not found!\n", icon_name);
+        return nullptr;
+    }
+    
+    bsp_display_lock(0);
+
+    // Create unique image descriptor
+    static lv_img_dsc_t img_dsc_pool[10];
+    static int dsc_index = 0;
+    
+    lv_img_dsc_t* img_dsc = &img_dsc_pool[dsc_index];
+    dsc_index = (dsc_index + 1) % 10;
+    
+    memset(img_dsc, 0, sizeof(lv_img_dsc_t));
+    img_dsc->data = icon->data;
+    img_dsc->data_size = *icon->size;
+    img_dsc->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    
+    // Create PNG image object
+    lv_obj_t *img = lv_img_create(lv_scr_act());
+    if (img) {
+        lv_img_set_src(img, img_dsc);
+        
+        // Apply zoom if not 1.0
+        if (zoom != 1.0f) {
+            int16_t zoom_lvgl = (int16_t)(zoom * 256);
+            lv_obj_set_style_transform_zoom(img, zoom_lvgl, LV_PART_MAIN);
+        }
+        
+        // Apply color if specified
+        if (color && icon->colorable) {
+            chinScreen_icon_set_color(img, color);
+        }
+        
+        // Set exact position - no alignment calculations
+        lv_obj_set_pos(img, x, y);
+    }
+
+    bsp_display_unlock();
+    return img;
 }

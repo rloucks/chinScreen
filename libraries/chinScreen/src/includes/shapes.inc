@@ -281,16 +281,17 @@ inline lv_obj_t* chinScreen_oval(const char* fillColorName, const char* borderCo
 // Function: Create button from shape
 /////////////////////////////////////////////////////////////
 inline lv_obj_t* chinScreen_button(const char* bgColorName, const char* borderColorName,
-                                   int width, int height, const char* text,
+                                   int width, int height, const char* text, 
                                    chinScreen_btn_callback_t callback,
-                                   const char* vAlign = "middle", const char* hAlign = "center") {
+                                   const char* vAlign = "middle", const char* hAlign = "center", const char* theFont = "medium") {
     bsp_display_lock(0);
-
+	if (theFont == "") {theFont = "medium";}
     lv_obj_t *btn = lv_btn_create(lv_scr_act());
     lv_obj_set_size(btn, width, height);
     lv_obj_set_style_bg_color(btn, getColorByName(bgColorName), LV_PART_MAIN);
     lv_obj_set_style_border_color(btn, getColorByName(borderColorName), LV_PART_MAIN);
     lv_obj_set_style_border_width(btn, 3, LV_PART_MAIN);
+	lv_obj_set_style_text_font(btn, getFontBySize(theFont), LV_PART_MAIN);
 
     // Add text if provided
     if (text && strlen(text) > 0) {

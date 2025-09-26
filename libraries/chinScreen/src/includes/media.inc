@@ -191,6 +191,37 @@ inline lv_obj_t* chinScreen_image_local(const lv_img_dsc_t *img_dsc,
 }
 
 
+inline lv_obj_t* chinScreen_image_fs(const char* path,
+                                     int x = -1, int y = -1,
+                                     const char* vAlign = "middle",
+                                     const char* hAlign = "center") {
+    bsp_display_lock(0);
+
+    lv_obj_t *img = lv_img_create(lv_scr_act());
+    lv_img_set_src(img, path);   // <-- Here you pass "S:/current_image.png"
+
+    // Position the object
+    if (x >= 0 && y >= 0) {
+        lv_obj_set_pos(img, x, y);
+    } else {
+        lv_align_t align = LV_ALIGN_CENTER;
+        if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_TOP_LEFT;
+        else if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_TOP_MID;
+        else if (strcmp(vAlign, "top") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_TOP_RIGHT;
+        else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_LEFT_MID;
+        else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_CENTER;
+        else if (strcmp(vAlign, "middle") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_RIGHT_MID;
+        else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "left") == 0) align = LV_ALIGN_BOTTOM_LEFT;
+        else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "center") == 0) align = LV_ALIGN_BOTTOM_MID;
+        else if (strcmp(vAlign, "bottom") == 0 && strcmp(hAlign, "right") == 0) align = LV_ALIGN_BOTTOM_RIGHT;
+
+        lv_obj_align(img, align, 0, 0);
+    }
+
+    bsp_display_unlock();
+    return img;
+}
+
 /////////////////////////////////////////////////////////////
 // Movie/Video player (using MJPEG format - most suitable for embedded)
 // Note: This is a simplified implementation - full video requires more complex frame handling
