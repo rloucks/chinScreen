@@ -65,9 +65,14 @@ chinScreen_background_gradient("blue", "cyan", "horizontal");
 ---
 
 ## Text Functions
+<<<<<<< HEAD
 
 Draw Text
 ```
+=======
+Note: if you use "center" on an object, the x/y will move from that starting point as an example
+```cpp
+>>>>>>> a5bb7e936eb83f0cadffa225142e7c8b9190296d
 chinScreen_text("Hello World", 50, 50, "yellow", "large");
 ```
 
