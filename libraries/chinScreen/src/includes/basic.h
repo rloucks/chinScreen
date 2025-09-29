@@ -11,7 +11,7 @@
 //   For updates, see git commits
 //   https://github.com/rloucks/chinScreen
 //
-//   Version: 0.0.2b
+//   Version: 0.3b
 //
 //   Hardware based for JC3248W525EN touch screen ESP32-S3 Panel
 //
@@ -74,63 +74,72 @@ inline const lv_font_t* getFontBySize(const char* size) {
 	if (strcmp(size, "big-pixel") == 0) return FONT_PIXEL_B;
 	
 	#ifdef CHINSCREEN_ENABLE_CURSIVE
-	if (strcmp(size, "cursive") == 0) return FONT_CURSIVE;
+	if (strcmp(size, "cursive-s") == 0) return FONT_CURSIVE;
+	if (strcmp(size, "cursive") == 0) return FONT_CURSIVE_20;
+	if (strcmp(size, "cursive-l") == 0) return FONT_CURSIVE_24;
 	#endif
 	
-	#ifdef CHINSCREEN_ENABLE_COMIC_SMALL
-	if (strcmp(size, "comic_small") == 0) return FONT_COMIC_SMALL;
+	#ifdef CHINSCREEN_ENABLE_COMIC
+	if (strcmp(size, "comic-s") == 0) return FONT_COMIC_18;
+	if (strcmp(size, "comic") == 0) return FONT_COMIC_20;
+	if (strcmp(size, "comic-l") == 0) return FONT_COMIC_24;
 	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_COMIC_REGULAR
-	if (strcmp(size, "comic_regular") == 0) return FONT_COMIC_REGULAR;
+		
+	#ifdef CHINSCREEN_ENABLE_BRUSH
+	if (strcmp(size, "brush-s") == 0) return FONT_BRUSH_18;
+	if (strcmp(size, "brush") == 0) return FONT_BRUSH_20;
+	if (strcmp(size, "brush-l") == 0) return FONT_BRUSH_24;
 	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_BRUSH_REGULAR
-	if (strcmp(size, "brush_regular") == 0) return FONT_BRUSH_REGULAR;
-	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_PEN_REGULAR
-	if (strcmp(size, "pen_regular") == 0) return FONT_PEN_REGULAR;
-	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_ICEBERG
-	if (strcmp(size, "iceberg") == 0) return FONT_ICEBERG;
-	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_TYPEWRITER
-	if (strcmp(size, "typewriter") == 0) return FONT_TYPEWRITER;
-	#endif
+
 	
 	#ifdef CHINSCREEN_ENABLE_DOTS
-	if (strcmp(size, "dots") == 0) return FONT_DOTS;
+	if (strcmp(size, "dots-s") == 0) return FONT_DOTS;
+	if (strcmp(size, "dots") == 0) return FONT_DOTS_20;
+	if (strcmp(size, "dots-l") == 0) return FONT_DOTS_24;
 	#endif
 	
-	#ifdef CHINSCREEN_ENABLE_BEAST
-	if (strcmp(size, "beast") == 0) return FONT_BEAST;
-	#endif
 	
 	#ifdef CHINSCREEN_ENABLE_MODERN
-	if (strcmp(size, "MODERN") == 0) return FONT_MODERN;
+	if (strcmp(size, "modern-s") == 0) return FONT_MODERN;
+	if (strcmp(size, "modern") == 0) return FONT_MODERN_20;
+	if (strcmp(size, "modern-l") == 0) return FONT_MODERN_24;
 	#endif
 
 	#ifdef CHINSCREEN_ENABLE_CREEPY
+	if (strcmp(size, "creepy-s") == 0) return FONT_CREEPY_18;
 	if (strcmp(size, "creepy") == 0) return FONT_CREEPY;
+	if (strcmp(size, "creepy-l") == 0) return FONT_CREEPY_24;
 	#endif
 	
 	#ifdef CHINSCREEN_ENABLE_ALADIN
-	if (strcmp(size, "aladin") == 0) return FONT_ALADIN;
+	if (strcmp(size, "aladin-s") == 0) return FONT_ALADIN;
+	if (strcmp(size, "aladin") == 0) return FONT_ALADIN_20;
+	if (strcmp(size, "aladin-l") == 0) return FONT_ALADIN_24;	
 	#endif
-	
-	#ifdef CHINSCREEN_ENABLE_CYOA_SMALL
-	if (strcmp(size, "cyoa-small") == 0) return FONT_CYOA_SMALL;
+
+	#ifdef CHINSCREEN_ENABLE_MONSTER
+	if (strcmp(size, "monster-s") == 0) return FONT_MONSTER;
+	if (strcmp(size, "monster") == 0) return FONT_MONSTER_20;
+	if (strcmp(size, "monster-l") == 0) return FONT_MONSTER_24;	
 	#endif
-	#ifdef CHINSCREEN_ENABLE_CYOA_REGULAR
-	if (strcmp(size, "cyoa-regular") == 0) return FONT_CYOA_REGULAR;
+
+	#ifdef CHINSCREEN_ENABLE_EMOJI
+	if (strcmp(size, "emoji-s") == 0) return FONT_EMOJI;
+	if (strcmp(size, "emoji") == 0) return FONT_EMOJI_20;
+	if (strcmp(size, "emoji-l") == 0) return FONT_EMOJI_24;	
 	#endif
-	#ifdef CHINSCREEN_ENABLE_CYOA_LARGE
-	if (strcmp(size, "cyoa-large") == 0) return FONT_CYOA_LARGE;
+
+	#ifdef CHINSCREEN_ENABLE_BITJI
+	if (strcmp(size, "bitji-s") == 0) return FONT_BITJI;
+	if (strcmp(size, "bitji") == 0) return FONT_BITJI_20;
+	if (strcmp(size, "bitji-l") == 0) return FONT_BITJI_24;	
 	#endif
-			
+
+	#ifdef CHINSCREEN_ENABLE_BLOCKHEAD
+	if (strcmp(size, "blockhead-s") == 0) return FONT_BLOCKHEAD;
+	if (strcmp(size, "blockhead") == 0) return FONT_BLOCKHEAD_20;
+	if (strcmp(size, "blockhead-l") == 0) return FONT_BLOCKHEAD_24;	
+	#endif
 	
     return FONT_MEDIUM; // default
 }

@@ -29,7 +29,7 @@
  *    BITMAPS
  *----------------*/
 /*Store the image of the glyphs*/
-static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
+static LV_ATTRIBUTE_LARGE_CONST const uint8_t aladin_glyph_bitmap[] = {
     /* U+0020 " " */
     /* U+0021 "!" */
     0x2d, 0x3c, 0x3c, 0x2c, 0x2c, 0x2c, 0x28, 0x28,
@@ -594,7 +594,7 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
-static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
+static const lv_font_fmt_txt_glyph_dsc_t aladin_glyph_dsc[] = {
     {.bitmap_index = 0, .adv_w = 0, .box_w = 0, .box_h = 0, .ofs_x = 0, .ofs_y = 0} /* id = 0 reserved */,
     {.bitmap_index = 0, .adv_w = 52, .box_w = 0, .box_h = 0, .ofs_x = 0, .ofs_y = 0},
     {.bitmap_index = 0, .adv_w = 69, .box_w = 4, .box_h = 12, .ofs_x = 0, .ofs_y = 0},
@@ -728,7 +728,7 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
 /*---------------------
  *  CHARACTER MAPPING
  *--------------------*/
-static const uint16_t unicode_list_2[] = {
+static const uint16_t aladin_unicode_list_2[] = {
     0x0, 0x2, 0x4, 0x6, 0x7, 0x8, 0x9, 0xa,
     0xb, 0xe, 0xf, 0x14, 0x16, 0x1b, 0x1c, 0x20,
     0x22, 0x24, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
@@ -736,7 +736,7 @@ static const uint16_t unicode_list_2[] = {
     0x93, 0xb8
 };
 /*Collect the unicode lists and glyph_id offsets*/
-static const lv_font_fmt_txt_cmap_t cmaps[] =
+static const lv_font_fmt_txt_cmap_t aladin_cmaps[] =
 {
     {
         .range_start = 32, .range_length = 64, .glyph_id_start = 1,
@@ -748,14 +748,14 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
     },
     {
         .range_start = 192, .range_length = 185, .glyph_id_start = 95,
-        .unicode_list = unicode_list_2, .glyph_id_ofs_list = NULL, .list_length = 34, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
+        .unicode_list = aladin_unicode_list_2, .glyph_id_ofs_list = NULL, .list_length = 34, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
     }
 };
 /*-----------------
  *    KERNING
  *----------------*/
 /*Pair left and right glyphs for kerning*/
-static const uint8_t kern_pair_glyph_ids[] =
+static const uint8_t aladin_kern_pair_glyph_ids[] =
 {
     8, 21,
     8, 83,
@@ -1098,7 +1098,7 @@ static const uint8_t kern_pair_glyph_ids[] =
 };
 /* Kerning between the respective left and right glyphs
  * 4.4 format which needs to scaled with `kern_scale`*/
-static const int8_t kern_pair_values[] =
+static const int8_t aladin_kern_pair_values[] =
 {
     -10, -9, 15, 21, 19, 13, 15, 9,
     21, 13, 26, 21, 26, -6, -9, -9,
@@ -1145,10 +1145,10 @@ static const int8_t kern_pair_values[] =
     -6, -3
 };
 /*Collect the kern pair's data in one place*/
-static const lv_font_fmt_txt_kern_pair_t kern_pairs =
+static const lv_font_fmt_txt_kern_pair_t aladin_kern_pairs =
 {
-    .glyph_ids = kern_pair_glyph_ids,
-    .values = kern_pair_values,
+    .glyph_ids = aladin_kern_pair_glyph_ids,
+    .values = aladin_kern_pair_values,
     .pair_cnt = 338,
     .glyph_ids_size = 0
 };
@@ -1156,18 +1156,18 @@ static const lv_font_fmt_txt_kern_pair_t kern_pairs =
  *  ALL CUSTOM DATA
  *--------------------*/
 /*Store all the custom data of the font*/
-static lv_font_fmt_txt_glyph_cache_t cache;
-static const lv_font_fmt_txt_dsc_t font_dsc = {
-    .glyph_bitmap = glyph_bitmap,
-    .glyph_dsc = glyph_dsc,
-    .cmaps = cmaps,
-    .kern_dsc = &kern_pairs,
+static lv_font_fmt_txt_glyph_cache_t aladin_cache;
+static const lv_font_fmt_txt_dsc_t aladin_font_dsc = {
+    .glyph_bitmap = aladin_glyph_bitmap,
+    .glyph_dsc = aladin_glyph_dsc,
+    .cmaps = aladin_cmaps,
+    .kern_dsc = &aladin_kern_pairs,
     .kern_scale = 16,
     .cmap_num = 3,
     .bpp = 2,
     .kern_classes = 0,
     .bitmap_format = 0,
-    .cache = &cache
+    .cache = &aladin_cache
 };
 /*-----------------
  *  PUBLIC FONT
@@ -1182,6 +1182,6 @@ const lv_font_t aladin = {
     .subpx = LV_FONT_SUBPX_NONE,
     .underline_position = -1,
     .underline_thickness = 1,
-    .dsc = &font_dsc,          /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
+    .dsc = &aladin_font_dsc,          /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 #endif

@@ -11,7 +11,7 @@
 //   For updates, see git commits
 //   https://github.com/rloucks/chinScreen
 //
-//   Version: 0.0.2b
+//   Version: 0.3b
 //
 //   Hardware based for JC3248W525EN touch screen ESP32-S3 Panel
 //
@@ -21,6 +21,8 @@
 #pragma once
 #include <Arduino.h>
 #include "includes/lvgl-8.3.11/src/lvgl.h"
+
+#include "includes/lvgl-8.3.11/src/extra/libs/gif/lv_gif.h"
 #include "display.h"
 #include "esp_bsp.h"
 #include "lv_port.h"
@@ -31,82 +33,105 @@
 #ifdef CHINSCREEN_ENABLE_CURSIVE
 #include "includes/fonts/cursive.inc"
 #define FONT_CURSIVE &cursive
+#include "includes/fonts/cursive_20.inc"
+#define FONT_CURSIVE_20 &cursive_20
+#include "includes/fonts/cursive_24.inc"
+#define FONT_CURSIVE_24 &cursive_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_COMIC_REGULAR
+#ifdef CHINSCREEN_ENABLE_COMIC
 #include "includes/fonts/comic_24.inc"
-#define FONT_COMIC_REGULAR &comic_24
+#define FONT_COMIC_18 &comic_24
+#include "includes/fonts/comic_20.inc"
+#define FONT_COMIC_20 &comic_20
+#include "includes/fonts/comic_24.inc"
+#define FONT_COMIC_24 &comic_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_COMIC_SMALL
-#include "includes/fonts/comic_18.inc"
-#define FONT_COMIC_SMALL &comic_18
-#endif
-
-#ifdef CHINSCREEN_ENABLE_BRUSH_REGULAR
+#ifdef CHINSCREEN_ENABLE_BRUSH
+#include "includes/fonts/brush_18.inc"
+#define FONT_BRUSH_18 &brush_18
+#include "includes/fonts/brush_20.inc"
+#define FONT_BRUSH_20 &brush_20
 #include "includes/fonts/brush_24.inc"
-#define FONT_BRUSH_REGULAR &brush_24
+#define FONT_BRUSH_24 &brush_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_PEN_REGULAR
-#include "includes/fonts/pen_24.inc"
-#define FONT_PEN_REGULAR &pen_24
+#ifdef CHINSCREEN_ENABLE_EMOJI
+#include "includes/fonts/emoji_18.inc"
+#define FONT_EMOJI_18 &emoji_18
+#include "includes/fonts/emoji_20.inc"
+#define FONT_EMOJI_20 &emoji_20
+#include "includes/fonts/emoji_24.inc"
+#define FONT_EMOJI_24 &emoji_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_ICEBERG
-#include "includes/fonts/iceberg_24.inc"
-#define FONT_ICEBERG &iceberg_24
+#ifdef CHINSCREEN_ENABLE_BITJI
+#include "includes/fonts/bitji_18.inc"
+#define FONT_BITJI_18 &bitji_18
+#include "includes/fonts/bitji_20.inc"
+#define FONT_BITJI_20 &bitji_24
+#include "includes/fonts/bitji_24.inc"
+#define FONT_BITJI_24 &bitji_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_TYPEWRITER
-#include "includes/fonts/typewriter.inc"
-#define FONT_TYPEWRITER &typewriter
+#ifdef CHINSCREEN_ENABLE_BLOCKHEAD
+#include "includes/fonts/blockhead_18.inc"
+#define FONT_BLOCKHEAD_18 &blockead_18
+#include "includes/fonts/blockhead_20.inc"
+#define FONT_BLOCKHEAD_20 &blockead_20
+#include "includes/fonts/blockhead_24.inc"
+#define FONT_BLOCKHEAD_24 &blockead_24
 #endif
 
 #ifdef CHINSCREEN_ENABLE_DOTS
 #include "includes/fonts/dots.inc"
 #define FONT_DOTS &dots
+#include "includes/fonts/dots_20.inc"
+#define FONT_DOTS_20 &dots_20
+#include "includes/fonts/dots_24.inc"
+#define FONT_DOTS_24 &dots_24
 #endif
 
-#ifdef CHINSCREEN_ENABLE_BEAST
-#include "includes/fonts/beast.inc"
-#define FONT_BEAST &beast
+#ifdef CHINSCREEN_ENABLE_MONSTER
+#include "includes/fonts/monster.inc"
+#define FONT_MONSTER &monster
+#include "includes/fonts/monster_20.inc"
+#define FONT_MONSTER_20 &monster
+#include "includes/fonts/monster_24.inc"
+#define FONT_MONSTER_24 &monster_24
 #endif
 
 #ifdef CHINSCREEN_ENABLE_MODERN
 #include "includes/fonts/modern.inc"
 #define FONT_MODERN &modern
+#include "includes/fonts/modern_20.inc"
+#define FONT_MODERN_20 &modern_20
+#include "includes/fonts/modern_24.inc"
+#define FONT_MODERN_24 &modern_24
 #endif
 
 #ifdef CHINSCREEN_ENABLE_ALADIN
 #include "includes/fonts/aladin.inc"
 #define FONT_ALADIN &aladin
+#include "includes/fonts/aladin_20.inc"
+#define FONT_ALADIN_20 &aladin_20
+#include "includes/fonts/aladin_24.inc"
+#define FONT_ALADIN_24 &aladin_24
 #endif
 
 #ifdef CHINSCREEN_ENABLE_CREEPY
+#include "includes/fonts/creepy_18.inc"
+#define FONT_CREEPY_18 &creepy_18
 #include "includes/fonts/creepy.inc"
 #define FONT_CREEPY &creepy
-#endif
-
-#ifdef CHINSCREEN_ENABLE_CYOA_SMALL
-#include "includes/fonts/cyoa_18.inc"
-#define FONT_CYOA_SMALL &cyoa_18
-#endif
-
-#ifdef CHINSCREEN_ENABLE_CYOA_REGULAR
-#include "includes/fonts/cyoa_20.inc"
-#define FONT_CYOA_REGULAR &cyoa_20
-#endif
-
-#ifdef CHINSCREEN_ENABLE_CYOA_LARGE
-#include "includes/fonts/cyoa_24.inc"
-#define FONT_CYOA_LARGE &cyoa_24
+#include "includes/fonts/creepy_24.inc"
+#define FONT_CREEPY_24 &creepy_24
 #endif
 
 
 
-
-// Font size constants - need to add more fonts
+//Font size constants - need to add more fonts
 #define FONT_SMALL   &lv_font_montserrat_12
 #define FONT_MEDIUM  &lv_font_montserrat_16
 #define FONT_LARGE   &lv_font_montserrat_20
